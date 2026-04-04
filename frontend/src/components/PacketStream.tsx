@@ -61,7 +61,6 @@ export default function PacketStream() {
     { accessorKey: "dst_ip", header: "Dest" },
     { accessorKey: "protocol", header: "Protocol" },
     { accessorKey: "length", header: "Len" },
-    { accessorKey: "infoString", header: "Info" },
   ];
 
   const table = useReactTable({
