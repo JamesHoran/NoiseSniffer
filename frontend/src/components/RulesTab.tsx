@@ -30,19 +30,19 @@ interface Rule {
 
 const PRESETS: Record<string, Rule[]> = {
   'Current Rules': [
-    { port: 53,   ip_whitelist: [],                 sound: 'piano', sound_type: 'C5',  frequency_boost: 8.0 },
-    { port: 80,   ip_whitelist: [],                 sound: 'synth', sound_type: 'E4',  frequency_boost: 8.0 },
-    { port: 22,   ip_whitelist: [],                 sound: 'piano', sound_type: 'F#5', frequency_boost: 8.0 },
+    { port: 53,   ip_whitelist: [],                 sound: 'piano', sound_type: 'C5',  frequency_boost: 5.0 },
+    { port: 80,   ip_whitelist: [],                 sound: 'synth', sound_type: 'E4',  frequency_boost: 5.0 },
+    { port: 22,   ip_whitelist: [],                 sound: 'piano', sound_type: 'F#5', frequency_boost: 5.0 },
     { port: 7844, ip_whitelist: [],                 sound: 'synth', sound_type: 'G4',  frequency_boost: 3.0 },
-    { port: 3702, ip_whitelist: [],                 sound: 'synth', sound_type: 'G5',  frequency_boost: 6.0 },
+    { port: 3702, ip_whitelist: [],                 sound: 'synth', sound_type: 'G5',  frequency_boost: 5.0 },
     { port: 443,  ip_whitelist: [],                 sound: 'piano', sound_type: 'C4',  frequency_boost: 1.5 },
   ],
   'Local Only (.138)': [
-    { port: 53,   ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'C5',  frequency_boost: 8.0 },
-    { port: 80,   ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'E4',  frequency_boost: 8.0 },
-    { port: 22,   ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'F#5', frequency_boost: 8.0 },
+    { port: 53,   ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'C5',  frequency_boost: 5.0 },
+    { port: 80,   ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'E4',  frequency_boost: 5.0 },
+    { port: 22,   ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'F#5', frequency_boost: 5.0 },
     { port: 7844, ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'G4',  frequency_boost: 3.0 },
-    { port: 3702, ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'G5',  frequency_boost: 6.0 },
+    { port: 3702, ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'G5',  frequency_boost: 5.0 },
     { port: 443,  ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'C4',  frequency_boost: 1.5 },
   ],
   '443 → .138': [
@@ -242,7 +242,7 @@ export function RulesTab() {
             <input
               type="number"
               min={0}
-              max={10}
+              max={5}
               step={0.1}
               value={form.frequency_boost}
               onChange={set("frequency_boost")}

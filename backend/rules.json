@@ -4,7 +4,7 @@
     "ip_whitelist": [],
     "sound": "piano",
     "sound_type": "C5",
-    "frequency_boost": 8.0
+    "frequency_boost": 5.0
   },
   {
     "port": 7844,
@@ -18,14 +18,14 @@
     "ip_whitelist": [],
     "sound": "piano",
     "sound_type": "F#5",
-    "frequency_boost": 8.0
+    "frequency_boost": 5.0
   },
   {
     "port": 80,
     "ip_whitelist": [],
     "sound": "synth",
     "sound_type": "E4",
-    "frequency_boost": 8.0
+    "frequency_boost": 5.0
   },
   {
     "port": 443,
@@ -39,6 +39,6 @@
     "ip_whitelist": [],
     "sound": "synth",
     "sound_type": "G5",
-    "frequency_boost": 6.0
+    "frequency_boost": 5.0
   }
 ]

@@ -13,7 +13,7 @@ from scipy.signal import resample as scipy_resample
 SAMPLE_RATE = 44100
 BLOCK_SIZE  = 512
 
-NOISE_AMPLITUDE = 0.08   # base white noise level
+NOISE_AMPLITUDE = 0.05 # base white noise level
 TONE_AMPLITUDE  = 0.4    # base tone amplitude
 DRONE_AMPLITUDE = 0.25   # per-note amplitude for the C major drone chord
 
