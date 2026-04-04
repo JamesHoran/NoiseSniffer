@@ -43,12 +43,21 @@ def parse_packet(packet):
     }
 
 
+LOG_FILE = "packets.log"
+
+
 def handle_packet(packet):
     parsed = parse_packet(packet)
     if parsed:
-        print(parsed)
+        print(packet.summary())
+        with open(LOG_FILE, "a") as f:
+            f.write(str(parsed) + "\n")
 
+
+IFACE = r"\Device\NPF_{D1E60D1D-DACE-48C1-9915-47A46F14DFF0}"
 
 if __name__ == "__main__":
-    print("Sniffing packets...")
-    sniff(filter="ip", prn=handle_packet, store=False)
+    timeout = 10
+    print(f"Sniffing on {IFACE} for {timeout} seconds, logging to {LOG_FILE}...")
+    sniff(iface=IFACE, filter="ip", prn=handle_packet, store=False, timeout=timeout)
+    print("Done")
