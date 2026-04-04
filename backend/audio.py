@@ -1,3 +1,6 @@
+"""
+Audio engine for network sonification with piano-like synthesis.
+"""
 import queue
 
 import numpy as np
@@ -8,7 +11,7 @@ SAMPLE_RATE = 44100
 BLOCK_SIZE  = 512
 
 NOISE_AMPLITUDE = 0.08   # base white noise level
-TONE_AMPLITUDE  = 0.4    # base sine burst amplitude
+TONE_AMPLITUDE  = 0.4    # base tone amplitude
 
 FFT_SIZE          = 2048
 NUM_BINS          = 1024
@@ -20,18 +23,31 @@ _HANN = np.hanning(FFT_SIZE)
 # Musical note → frequency (Hz)
 NOTES: dict[str, float] = {
     "C3":  130.81, "D3": 146.83, "E3": 164.81, "F3": 174.61,
-    "G3":  196.00, "A3": 220.00, "B3": 246.94,
-    "C4":  261.63, "D4": 293.66, "E4": 329.63, "F4": 349.23,
-    "G4":  392.00, "A4": 440.00, "B4": 493.88,
-    "C5":  523.25, "D5": 587.33, "E5": 659.25, "F5": 698.46,
-    "G5":  783.99, "A5": 880.00, "B5": 987.77,
+    "G3":  196.00, "A3": 220.00, "B3":  246.94,
+    "C4":  261.63, "D4": 293.66, "E4":  329.63, "F4": 349.23,
+    "G4":  392.00, "A4":  400.00, "B4":  493.88,
+    "C5":  523.25, "D5":  587.33, "E5":  659.25, "F5":  698.46,
+    "G5":  783.99, "A5":  880.00, "B5":  987.77,
 }
 DEFAULT_NOTE = "A4"
 
 
+# Piano-like harmonic ratios and amplitudes
+# Real pianos have complex harmonic series - these approximate the sound
+PIANO_HARMONICS = [
+    (1.0, 1.0),    # Fundamental
+    (2.0, 0.6),    # 2nd harmonic (octave)
+    (3.0, 0.3),    # 3rd harmonic (fifth)
+    (4.0, 0.2),    # 4th harmonic (double octave)
+    (5.0, 0.1),    # 5th harmonic
+    (6.0, 0.05),   # 6th harmonic
+    (7.0, 0.03),   # 7th harmonic
+    (8.0, 0.02),   # 8th harmonic
+]
+
+
 def _note_to_freq(note: str) -> float:
     return NOTES.get(note, NOTES[DEFAULT_NOTE])
-
 
 
 def _compute_spectrum(samples: np.ndarray) -> list[float]:
@@ -41,46 +57,83 @@ def _compute_spectrum(samples: np.ndarray) -> list[float]:
     return normalised[:NUM_BINS].tolist()
 
 
-class _Tone:
-    """0.5s sine wave burst with a short attack and linear decay."""
-    ATTACK_S = 0.02   # 20 ms
-    DECAY_S  = 0.48   # 480 ms  →  total 0.5 s
+class PianoTone:
+    """
+    Piano-like tone using additive synthesis for realistic piano sound.
+
+    Piano envelope:
+    - Fast attack (~5ms) - hammer strikes string
+    - Initial decay (~50ms) - percussive "knock"
+    - Sustain level (~30%) - the ringing sound
+    - Release (~500ms) - gradual fade out
+    """
+    ATTACK_S = 0.005   # 5 ms
+    DECAY_S = 0.05     # 50 ms
+    SUSTAIN_LEVEL = 0.3
+    RELEASE_S = 0.5    # 500 ms
+    TOTAL_S = ATTACK_S + DECAY_S + RELEASE_S
 
     def __init__(self, freq_hz: float, boost: float = 1.0):
-        self._freq   = freq_hz
-        self._amp    = TONE_AMPLITUDE * boost
-        self._attack = int(SAMPLE_RATE * self.ATTACK_S)
-        self._decay  = int(SAMPLE_RATE * self.DECAY_S)
-        self._total  = self._attack + self._decay
-        self._pos    = 0
-        self._phase  = 0.0
+        self._freq = freq_hz
+        self._amp = TONE_AMPLITUDE * boost
+        self._phase = 0.0
+
+        self._attack_len = int(SAMPLE_RATE * self.ATTACK_S)
+        self._decay_len = int(SAMPLE_RATE * self.DECAY_S)
+        self._release_len = int(SAMPLE_RATE * self.RELEASE_S)
+        self._total_len = self._attack_len + self._decay_len + self._release_len
+        self._pos = 0
 
     def render(self, frames: int) -> tuple[np.ndarray, bool]:
-        n = min(frames, self._total - self._pos)
+        """Render up to `frames` samples of the piano tone."""
+        n = min(frames, self._total_len - self._pos)
+        if n <= 0:
+            return np.zeros(frames, dtype=np.float32), True
 
+        pos_indices = self._pos + np.arange(n)
+        envelope = np.zeros(n, dtype=np.float32)
+
+        # Attack phase (linear rise)
+        attack_mask = pos_indices < self._attack_len
+        envelope[attack_mask] = pos_indices[attack_mask] / self._attack_len
+
+        # Decay phase (exponential to sustain)
+        decay_end = self._attack_len + self._decay_len
+        decay_mask = (pos_indices >= self._attack_len) & (pos_indices < decay_end)
+        if np.any(decay_mask):
+            decay_pos = pos_indices[decay_mask] - self._attack_len
+            envelope[decay_mask] = self.SUSTAIN_LEVEL + (1 - self.SUSTAIN_LEVEL) * np.exp(-5 * decay_pos / self._decay_len)
+
+        # Release phase (exponential to zero)
+        release_mask = pos_indices >= decay_end
+        if np.any(release_mask):
+            release_pos = pos_indices[release_mask] - decay_end
+            envelope[release_mask] = self.SUSTAIN_LEVEL * np.exp(-5 * release_pos / self._release_len)
+
+        # Additive synthesis for piano-like timbre
+        waveform = np.zeros(n, dtype=np.float32)
         phase_step = 2 * np.pi * self._freq / SAMPLE_RATE
-        phases = self._phase + np.arange(n) * phase_step
-        sine   = np.sin(phases) * self._amp
 
-        pos_idx = self._pos + np.arange(n)
-        env = np.where(
-            pos_idx < self._attack,
-            pos_idx / self._attack,
-            1.0 - (pos_idx - self._attack) / self._decay,
-        ).clip(0.0, 1.0)
+        for harmonic_ratio, harmonic_amp in PIANO_HARMONICS:
+            harmonic_phase = self._phase * harmonic_ratio
+            phases = harmonic_phase + np.arange(n) * phase_step * harmonic_ratio
+            waveform += np.sin(phases) * harmonic_amp
+
+        waveform = waveform / len(PIANO_HARMONICS) * self._amp * envelope
+        waveform = waveform.astype(np.float32)
+
+        self._phase = float((self._phase + np.arange(n)[-1] * phase_step) % (2 * np.pi)) if n > 0 else self._phase
+        self._pos += n
 
         out = np.zeros(frames, dtype=np.float32)
-        out[:n] = (sine * env).astype(np.float32)
-
-        self._phase = float(phases[-1]) + phase_step if n > 0 else self._phase
-        self._pos  += n
-        return out, self._pos >= self._total
+        out[:n] = waveform
+        return out, self._pos >= self._total_len
 
 
 class AudioEngine:
     def __init__(self):
-        self._new_tones: queue.SimpleQueue[_Tone] = queue.SimpleQueue()
-        self._active_tones: list[_Tone] = []
+        self._new_tones: queue.SimpleQueue[PianoTone] = queue.SimpleQueue()
+        self._active_tones: list[PianoTone] = []
         self._stream: sd.OutputStream | None = None
         self._rules: dict[int, dict] = {}
         self._muted: bool = False
@@ -124,13 +177,13 @@ class AudioEngine:
                 rule = None
 
         if not rule:
-            return  # no rule = no tone, only white noise
+            return
 
         note  = rule.get("sound_type", DEFAULT_NOTE)
         freq  = _note_to_freq(note)
         boost = rule.get("frequency_boost", 1.0)
         print(f"[rule hit] port={dst_port} note={note} ({freq:.1f} Hz) boost={boost}")
-        self._new_tones.put(_Tone(freq, boost))
+        self._new_tones.put(PianoTone(freq, boost))
 
     def _callback(self, outdata, frames, time_info, status):
         if self._muted:
