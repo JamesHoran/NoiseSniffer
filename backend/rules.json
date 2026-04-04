@@ -32,7 +32,7 @@
     "ip_whitelist": [],
     "sound": "synth",
     "sound_type": "G4",
-    "frequency_boost": 5.0
+    "frequency_boost": 3.0
   },
   {
     "port": 22,
