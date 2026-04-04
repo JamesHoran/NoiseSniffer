@@ -126,7 +126,7 @@ function App() {
       </nav>
 
       {/* Main content area - constrained width */}
-      <main className="w-full px-6 py-6">
+      <main className="w-full max-w-7xl mx-auto px-6 py-6">
         <Tabs defaultValue="spectrum" className="w-full">
           <TabsList>
             <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>
