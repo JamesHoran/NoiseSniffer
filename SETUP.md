@@ -28,9 +28,9 @@ pipenv shell
 
 ## Frontend (React)
 
-### 1. Navigate to the noise-sniffer folder
+### 1. Navigate to the frontend folder
 ```bash
-cd noise-sniffer
+cd frontend
 ```
 
 ### 2. Install dependencies
