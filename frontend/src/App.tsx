@@ -70,8 +70,8 @@ function App() {
                 <Activity className="h-6 w-6 text-white" />
               </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">
+            <div className="flex flex-col justify-center">
+              <h1 className="text-2xl font-extrabold text-zinc-100 tracking-tight leading-none">
                 NoiseSniffer
               </h1>
             </div>
