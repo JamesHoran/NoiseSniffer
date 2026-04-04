@@ -1,9 +1,9 @@
 # Oliver's TODO (Backend — Python)
 
 ## Step 1: Project setup
-- [ ] Create `backend/` folder and virtual environment
-- [ ] Create `Pipfile` and `Pipfile.lock` with: `scapy`, `fastapi`, `uvicorn`, `numpy`, `scipy`, `sounddevice`, `watchdog`
-- [ ] Install dependencies
+- [+] Create `backend/` folder and virtual environment
+- [+] Create `Pipfile` and `Pipfile.lock` with: `scapy`, `fastapi`, `uvicorn`, `numpy`, `scipy`, `sounddevice`, `watchdog`
+- [+] Install dependencies
 
 ## Step 2: Packet capture
 - [ ] Use Scapy's `sniff()` to capture live packets
