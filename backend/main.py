@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from scapy.all import sniff, conf as scapy_conf
 from sniffer import parse_packet
+from audio import engine as audio_engine
 
 load_dotenv()
 IFACE = os.environ["IFACE"]  # set in .env
@@ -56,6 +57,9 @@ async def startup():
     t = threading.Thread(target=_start_sniffer, daemon=True)
     t.start()
 
+    # Start the audio engine (opens the sounddevice output stream).
+    audio_engine.start()
+
     # Launch the broadcast loop as a background async task.
     asyncio.create_task(_broadcast_loop())
 
@@ -74,6 +78,9 @@ async def _broadcast_loop():
                     dead.add(ws)
             for ws in dead:
                 _clients.discard(ws)
+
+        # Feed the packet into the audio engine.
+        audio_engine.on_packet(json.loads(message))
 
 
 @app.websocket("/ws")
