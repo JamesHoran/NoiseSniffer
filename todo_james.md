@@ -1,7 +1,7 @@
 # James's TODO (Frontend — React)
 
 ## Step 1: Project setup
-- [ ] Scaffold React app (`pnpm create vite`) in `noise-sniffer/`
+- [ ] Scaffold React app (`pnpm create vite`) in `frontend/`
 - [ ] Install dependencies with `pnpm install` (charting library TBD for Tab 2)
 
 ## Step 2: Tab shell
