@@ -79,6 +79,10 @@ def start_watcher(on_change) -> Observer:
     _rules = load_rules()
     print(f"[rules watcher] Initial rules loaded: {list(_rules.keys())}")
 
+    # Call on_change with initial rules so the audio engine gets them on startup
+    print(f"[rules watcher] Calling on_change with initial rules...")
+    on_change(_rules)
+
     observer = Observer()
     observer.schedule(_RulesFileHandler(on_change), str(RULES_FILE.parent), recursive=False)
     observer.start()
