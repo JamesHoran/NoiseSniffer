@@ -13,7 +13,6 @@ scipy = "*"
 watchdog = "*"
 python-dotenv = "*"
 sounddevice = "*"
-miniaudio = "*"
 librosa = "*"
 
 [dev-packages]
