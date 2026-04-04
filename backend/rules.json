@@ -2,37 +2,43 @@
   {
     "port": 443,
     "ip_whitelist": [],
-    "sound_type": "rain",
-    "frequency_boost": 3.0
+    "sound_type": "C4",
+    "frequency_boost": 3.0,
+    "instrument": "piano"
   },
   {
     "port": 80,
     "ip_whitelist": [],
-    "sound_type": "wind",
-    "frequency_boost": 2.0
+    "sound_type": "E4",
+    "frequency_boost": 2.0,
+    "instrument": "chiptune"
   },
   {
     "port": 53,
     "ip_whitelist": [],
-    "sound_type": "forest",
-    "frequency_boost": 4.0
+    "sound_type": "B4",
+    "frequency_boost": 4.0,
+    "instrument": "bells"
   },
   {
     "port": 3702,
     "ip_whitelist": [],
-    "sound_type": "drones",
-    "frequency_boost": 2.0
+    "sound_type": "G5",
+    "frequency_boost": 2.0,
+    "instrument": "synth"
   },
   {
     "port": 22,
     "ip_whitelist": [],
-    "sound_type": "hospital_beep",
-    "frequency_boost": 5.0
+    "sound_type": "B3",
+    "frequency_boost": 5.0,
+    "instrument": "trumpet"
   },
   {
     "port": 7844,
     "ip_whitelist": [],
-    "sound_type": "fire",
-    "frequency_boost": 3.0
+    "sound_type": "G4",
+    "frequency_boost": 3.0,
+    "instrument": "guitar"
   }
 ]

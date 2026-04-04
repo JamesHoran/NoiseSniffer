@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from scapy.all import sniff, conf as scapy_conf
 from sniffer import parse_packet
-from audio_ambient import engine as audio_engine
+from audio_samples import engine as audio_engine
 from rules import save_rule, delete_rule, get_rules, start_watcher
 
 load_dotenv()
@@ -110,8 +110,9 @@ async def set_mute(body: MuteRequest):
 class Rule(BaseModel):
     port: int
     ip_whitelist: list[str] = []
-    sound_type: str = "rain"  # Ambient sound: rain, wind, fire, forest, drones, hospital_beep
-    frequency_boost: float = 1.0  # Volume boost for the sound
+    sound_type: str = "A4"  # Musical note: C3–B5 (e.g. A4 = 440 Hz)
+    frequency_boost: float = 1.0  # Volume boost
+    instrument: str = "piano"  # Instrument: piano, guitar, flute, trumpet, bells, chiptune, synth
 
 
 @app.get("/rules")
