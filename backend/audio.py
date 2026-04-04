@@ -107,7 +107,10 @@ class AudioEngine:
         self._muted = muted
 
     def update_rules(self, rules: dict[int, dict]):
+        print(f"[audio_engine] update_rules called with {len(rules)} rule(s): {list(rules.keys())}")
         self._rules = rules
+        for port, rule in rules.items():
+            print(f"[audio_engine]   Port {port}: note={rule.get('sound_type')}, boost={rule.get('frequency_boost')}, whitelist={rule.get('ip_whitelist')}")
         print(f"[rules] {len(rules)} rule(s) active — ports: {list(rules.keys())}")
 
     def on_packet(self, parsed: dict):
