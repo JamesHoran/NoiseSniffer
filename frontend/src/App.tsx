@@ -3,7 +3,7 @@ import "./App.css";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs";
 import { SpectrumAnalyzer } from "./components/SpectrumAnalyzer";
 // Assuming you have a PacketTable component for the left side of your sketch
-// import { PacketTable } from "./components/PacketTable"; 
+// import { PacketTable } from "./components/PacketTable";
 import { useWebSocket } from "./hooks/useWebSocket";
 import type { SpectrumMessage, PacketMessage } from "./hooks/useWebSocket";
 
@@ -76,7 +76,7 @@ function App() {
               annotationsRef={latestAnnotationsRef}
             />
           </TabsContent>
-          
+
           <TabsContent value="tab2">
              {/* ... Settings content remains exactly the same ... */}
           </TabsContent>

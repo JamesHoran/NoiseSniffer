@@ -32,7 +32,6 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
   // 1. Draw custom annotations (Claude did this perfectly)
   const drawAnnotations = useCallback((u: uPlot) => {
     const { ctx, bbox } = u;
-    // Read directly from the passed-in ref
     const annotations = annotationsRef.current;
 
     if (!annotations || annotations.length === 0) return;
@@ -58,7 +57,7 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
     });
 
     ctx.restore();
-  }, [annotationsRef]);
+  }, []);
 
   // 2. The true zero-render animation loop
   const drawLoop = useCallback(() => {
@@ -83,11 +82,120 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
     };
   }, [drawLoop]);
 
-  // ... (The rest of Claude's useMemo options and the return statement stay exactly the same!) ...
-  
   const options = useMemo<uPlot.Options>(() => ({
-    // ... Claude's uPlot styling goes here ...
-    hooks: { draw: [drawAnnotations] }
+    width: 800,
+    height: 400,
+
+    // Axes configuration
+    scales: {
+      x: {
+        time: false,
+        auto: false,
+        range: [0, DEFAULT_BINS - 1],
+      },
+      y: {
+        min: -100,
+        max: 0,
+      },
+    },
+
+    // Series configuration - dark mode styling
+    series: [
+      {}, // X-axis (placeholder)
+      {
+        label: 'Amplitude (dB)',
+        stroke: '#3b82f6',
+        width: 1.5,
+        fill: 'rgba(59, 130, 246, 0.2)',
+      },
+    ],
+
+    // Axes styling for dark mode
+    axes: [
+      {
+        show: true,
+        grid: {
+          show: true,
+          stroke: '#374151',
+          width: 1,
+        },
+        ticks: {
+          show: true,
+          stroke: '#6b7280',
+          width: 1,
+          size: 4,
+        },
+        label: 'Frequency Bin',
+        labelFont: 'bold 12px system-ui',
+        labelColor: '#9ca3af',
+        color: '#9ca3af',
+        font: '11px system-ui',
+        size: 50,
+      },
+      {
+        show: true,
+        grid: {
+          show: true,
+          stroke: '#374151',
+          width: 1,
+        },
+        ticks: {
+          show: true,
+          stroke: '#6b7280',
+          width: 1,
+          size: 4,
+        },
+        label: 'Amplitude (dB)',
+        labelFont: 'bold 12px system-ui',
+        labelColor: '#9ca3af',
+        color: '#9ca3af',
+        font: '11px system-ui',
+        size: 60,
+        values: (_self, splits) => splits.map(v => v.toFixed(0) + ' dB'),
+      },
+    ],
+
+    // Hook for drawing custom annotations
+    hooks: {
+      draw: [
+        drawAnnotations,
+      ],
+    },
+
+    // Padding for labels
+    padding: [null, 60, null, 50],
+
+    // Cursor configuration
+    cursor: {
+      show: true,
+      x: true,
+      y: true,
+      drag: {
+        setScale: false,
+        setRange: false,
+      },
+      points: {
+        show: false,
+      },
+      lock: false,
+      focus: {
+        prox: 10,
+      },
+    },
+
+    // Tooltip configuration
+    tooltip: {
+      show: true,
+      frame: {
+        stroke: '#4b5563',
+        'stroke-width': 1,
+      },
+    },
+
+    // Legend
+    legend: {
+      show: false,
+    },
   }), [drawAnnotations]);
 
   const initialData = useMemo(() => {
@@ -115,3 +223,5 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
     </div>
   );
 };
+
+export default SpectrumAnalyzer;
