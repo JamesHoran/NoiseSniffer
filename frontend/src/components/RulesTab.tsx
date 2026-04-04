@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Trash2 } from "lucide-react";
 
 const API = "http://localhost:8000";
 
@@ -308,8 +309,9 @@ export function RulesTab() {
               </div>
               <button
                 onClick={() => handleDelete(rule.port)}
-                className="text-xs text-red-400 hover:text-red-300 border border-red-900/50 hover:border-red-700 hover:bg-red-950/30 px-3 py-1.5 rounded-lg transition-all shrink-0"
+                className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 border border-red-900/50 hover:border-red-700 hover:bg-red-950/30 px-3 py-1.5 rounded-lg transition-all shrink-0"
               >
+                <Trash2 className="h-3.5 w-3.5" />
                 Delete
               </button>
             </div>
