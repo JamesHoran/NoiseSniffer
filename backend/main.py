@@ -117,15 +117,21 @@ class Rule(BaseModel):
 
 @app.get("/rules")
 async def list_rules():
-    return list(get_rules().values())
+    print(f"[http GET /rules] Returning rules")
+    rules = list(get_rules().values())
+    print(f"[http GET /rules] Returning {len(rules)} rule(s)")
+    return rules
 
 
 @app.post("/rules", status_code=201)
 async def post_rule(rule: Rule):
     """Create or update a rule for a given port."""
+    print(f"[http POST /rules] Received rule: {rule.model_dump()}")
     rule_dict = rule.model_dump()
     save_rule(rule_dict)
+    print(f"[http POST /rules] Calling audio_engine.update_rules with current rules")
     audio_engine.update_rules(get_rules())
+    print(f"[http POST /rules] Returning saved rule")
     return rule_dict
 
 
