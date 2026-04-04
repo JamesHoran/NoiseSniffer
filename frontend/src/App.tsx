@@ -6,7 +6,7 @@ import { RulesTab } from "./components/RulesTab";
 import { useWebSocket } from "./hooks/useWebSocket";
 import type { PacketMessage, WebSocketMessage } from "./hooks/useWebSocket";
 import PacketStream from "./components/PacketStream";
-import { Activity, Database, Shield } from "lucide-react";
+import { Activity, Database, Shield, Volume2, VolumeX, Wifi, WifiOff } from "lucide-react";
 
 const WS_URL = "ws://localhost:8000/ws";
 
@@ -59,37 +59,77 @@ function App() {
   return (
     <>
       {/* Header with connection status */}
-      <nav className="mb-6 flex items-center justify-between px-4 border-b 1px zinc-500">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-900/30">
-            <Activity className="h-5 w-5 text-white" />
+      <nav className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/50">
+        <div className="flex items-center justify-between px-6 py-4">
+          {/* Logo and title */}
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl blur-lg opacity-50"></div>
+              <div className="relative h-12 w-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                <Activity className="h-6 w-6 text-white" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                NoiseSniffer
+                <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                  v1.0
+                </span>
+              </h1>
+              <p className="text-sm text-zinc-400">Real-time network audio visualization</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">NoiseSniffer</h1>
-            <p className="text-xs text-zinc-500">Real-time network audio visualization</p>
+
+          {/* Status and controls */}
+          <div className="flex items-center gap-3">
+            {/* Connection status */}
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
+              isConnected
+                ? "bg-green-950/30 border-green-900/50 text-green-400"
+                : "bg-red-950/30 border-red-900/50 text-red-400"
+            }`}>
+              {isConnected ? (
+                <>
+                  <Wifi className="h-4 w-4 animate-pulse" />
+                  <span className="text-sm font-medium">Live</span>
+                </>
+              ) : (
+                <>
+                  <WifiOff className="h-4 w-4" />
+                  <span className="text-sm font-medium">Offline</span>
+                </>
+              )}
+            </div>
+
+            {/* Mute button */}
+            <button
+              onClick={toggleMute}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl border font-medium transition-all ${
+                isMuted
+                  ? "bg-red-950/30 border-red-900/50 text-red-400 hover:border-red-700 hover:bg-red-950/50"
+                  : "bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800"
+              }`}
+              title={isMuted ? "Unmute audio" : "Mute audio"}
+            >
+              {isMuted ? (
+                <>
+                  <VolumeX className="h-4 w-4" />
+                  <span className="text-sm">Muted</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="h-4 w-4" />
+                  <span className="text-sm">Audio On</span>
+                </>
+              )}
+            </button>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <span
-            className={`text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-lg ${isConnected ? "text-green-400 bg-green-950/30 border border-green-900/50" : "text-red-400 bg-red-950/30 border border-red-900/50"}`}
-          >
-            <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-400 animate-pulse" : "bg-red-400"}`}></span>
-            {isConnected ? "Live" : "Disconnected"}
-          </span>
-          <button
-            onClick={toggleMute}
-            className={`text-xs px-3 py-2 rounded-lg border font-medium transition-all ${
-              isMuted
-                ? "border-red-900/50 text-red-400 hover:border-red-700 hover:bg-red-950/30"
-                : "border-zinc-700 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50"
-            }`}
-          >
-            {isMuted ? "Unmute" : "Mute"}
-          </button>
         </div>
       </nav>
-      <main id="center" className="border-x border-solid border-[#333]">
-        <Tabs defaultValue="spectrum">
+
+      {/* Main content area */}
+      <main id="center" className="px-6 py-6">
+        <Tabs defaultValue="spectrum" className="w-full">
           <TabsList>
             <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>
               Spectrum
