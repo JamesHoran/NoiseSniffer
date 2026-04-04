@@ -2,26 +2,30 @@ import { useState, useEffect } from 'react';
 
 const API = 'http://localhost:8000';
 
+// All notes C3–B5 in chromatic order, including sharps
 const NOTES = [
-  'C3','D3','E3','F3','G3','A3','B3',
-  'C4','D4','E4','F4','G4','A4','B4',
-  'C5','D5','E5','F5','G5','A5','B5',
+  'C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3',
+  'C4','C#4','D4','D#4','E4','F4','F#4','G4','G#4','A4','A#4','B4',
+  'C5','C#5','D5','D#5','E5','F5','F#5','G5','G#5','A5','A#5','B5',
 ] as const;
 type SoundType = typeof NOTES[number];
+
+const SOUNDS = ['synth', 'piano'] as const;
+type Sound = typeof SOUNDS[number];
 
 interface Rule {
   port: number;
   ip_whitelist: string[];
+  sound: Sound;
   sound_type: SoundType;
-  frequency_hz: number | null;
   frequency_boost: number;
 }
 
 const EMPTY_FORM = {
   port: '',
   ip_whitelist: '',
+  sound: 'synth' as Sound,
   sound_type: 'A4' as SoundType,
-  frequency_hz: '',
   frequency_boost: '1.0',
 };
 
@@ -59,8 +63,8 @@ export function RulesTab() {
       ip_whitelist: form.ip_whitelist
         ? form.ip_whitelist.split(',').map(s => s.trim()).filter(Boolean)
         : [],
+      sound: form.sound,
       sound_type: form.sound_type,
-      frequency_hz: null, // frequency_hz: form.frequency_hz ? parseFloat(form.frequency_hz) : null,
       frequency_boost: parseFloat(form.frequency_boost) || 1.0,
     };
 
@@ -116,6 +120,17 @@ export function RulesTab() {
           </div>
 
           <div>
+            <label className={labelCls}>Sound</label>
+            <select value={form.sound} onChange={set('sound')} className={inputCls}>
+              {SOUNDS.map(s => (
+                <option key={s} value={s}>
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
             <label className={labelCls}>Note</label>
             <select value={form.sound_type} onChange={set('sound_type')} className={inputCls}>
               {NOTES.map(t => (
@@ -123,19 +138,6 @@ export function RulesTab() {
               ))}
             </select>
           </div>
-
-          {/* Frequency field commented out
-          <div>
-            <label className={labelCls}>Frequency <span className="text-gray-500">(Hz, empty = auto)</span></label>
-            <input
-              type="number" min={20} max={20000} step={1}
-              placeholder="e.g. 1000"
-              value={form.frequency_hz}
-              onChange={set('frequency_hz')}
-              className={inputCls}
-            />
-          </div>
-          */}
 
           <div>
             <label className={labelCls}>Frequency Boost <span className="text-gray-500">(1.0 = neutral)</span></label>
@@ -147,7 +149,7 @@ export function RulesTab() {
             />
           </div>
 
-          <div>
+          <div className="col-span-2">
             <label className={labelCls}>IP Whitelist <span className="text-gray-500">(comma-separated, empty = all)</span></label>
             <input
               type="text"
@@ -184,19 +186,19 @@ export function RulesTab() {
               key={rule.port}
               className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 flex items-center justify-between gap-4"
             >
-              <div className="grid grid-cols-4 gap-4 flex-1 text-sm">
+              <div className="grid grid-cols-5 gap-4 flex-1 text-sm">
                 <div>
                   <span className="text-gray-500 text-xs block">Port</span>
                   <span className="font-mono text-white">{rule.port}</span>
                 </div>
                 <div>
+                  <span className="text-gray-500 text-xs block">Sound</span>
+                  <span className="text-white capitalize">{rule.sound ?? 'synth'}</span>
+                </div>
+                <div>
                   <span className="text-gray-500 text-xs block">Note</span>
                   <span className="text-white">{rule.sound_type}</span>
                 </div>
-                {/* <div>
-                  <span className="text-gray-500 text-xs block">Frequency</span>
-                  <span className="text-white">{rule.frequency_hz ? `${rule.frequency_hz} Hz` : 'auto'}</span>
-                </div> */}
                 <div>
                   <span className="text-gray-500 text-xs block">Boost</span>
                   <span className="text-white">{rule.frequency_boost.toFixed(1)}×</span>

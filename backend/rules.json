@@ -2,6 +2,7 @@
   {
     "port": 443,
     "ip_whitelist": [],
+    "sound": "piano",
     "sound_type": "C4",
     "frequency_boost": 5.0
   },
@@ -14,6 +15,7 @@
   {
     "port": 53,
     "ip_whitelist": [],
+    "sound": "piano",
     "sound_type": "B4",
     "frequency_boost": 8.0
   },
@@ -32,7 +34,8 @@
   {
     "port": 22,
     "ip_whitelist": [],
-    "sound_type": "B3",
-    "frequency_boost": 4.0
+    "sound": "piano",
+    "sound_type": "F#5",
+    "frequency_boost": 8.0
   }
 ]

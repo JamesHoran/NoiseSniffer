@@ -42,12 +42,12 @@ Sent at ~30fps for the spectrum analyzer (Tab 2).
 {
   "port": 443,
   "ip_whitelist": ["192.168.1.1", "10.0.0.5"],
+  "sound": "piano",
   "sound_type": "A4",
-  "frequency_hz": 1000,
   "frequency_boost": 1.5
 }
 ```
 - `ip_whitelist`: list of IPs this rule applies to; empty list `[]` means all IPs
-- `sound_type`: musical note name, e.g. `"A4"` (440 Hz); supported range `"C3"`–`"B5"`
-- `frequency_hz`: centre frequency (Hz) of the bandpass EQ filter; omit to use automatic port-based mapping
-- `frequency_boost`: amplitude multiplier for this band (1.0 = neutral)
+- `sound`: `"synth"` (default) for a synthesized sine burst, or `"piano"` to play a pre-loaded OGG piano sample
+- `sound_type`: musical note name including sharps, e.g. `"A4"`, `"C#4"`; supported range `"C3"`–`"B5"` (36 chromatic notes)
+- `frequency_boost`: amplitude multiplier (1.0 = neutral)
