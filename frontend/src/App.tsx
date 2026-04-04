@@ -71,7 +71,7 @@ function App() {
               </div>
             </div>
             <div className="flex flex-col justify-center">
-              <h1 className="text-2xl font-extrabold text-zinc-100 tracking-tight leading-none">
+              <h1 className="text-lg font-extrabold text-zinc-100 tracking-tight leading-none">
                 NoiseSniffer
               </h1>
             </div>
