@@ -65,8 +65,8 @@ const EMPTY_FORM = {
 };
 
 const inputCls =
-  "w-full rounded bg-gray-800 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:border-blue-500";
-const labelCls = "block text-xs text-gray-400 mb-1";
+  "w-full rounded-lg bg-zinc-900/50 border border-zinc-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder:text-zinc-500";
+const labelCls = "block text-xs font-medium text-zinc-400 mb-1.5";
 
 export function RulesTab() {
   const [rules, setRules] = useState<Rule[]>([]);
@@ -167,8 +167,11 @@ export function RulesTab() {
     <div className="p-4 text-white max-w-2xl">
 
       {/* Presets */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-4">
-        <h2 className="text-sm font-semibold text-gray-300 mb-3">Presets</h2>
+      <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-700/50 rounded-xl p-5 mb-4 shadow-lg">
+        <h2 className="text-sm font-semibold text-zinc-200 mb-3 flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-purple-500"></span>
+          Presets
+        </h2>
         <div className="flex gap-2">
           <select
             value={selectedPreset}
@@ -181,16 +184,19 @@ export function RulesTab() {
           </select>
           <button
             onClick={handleApplyPreset}
-            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors shrink-0"
+            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg shadow-purple-900/20 shrink-0"
           >
-            Apply
+            Apply Preset
           </button>
         </div>
       </div>
 
       {/* Add rule form */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-6">
-        <h2 className="text-sm font-semibold text-gray-300 mb-4">New Rule</h2>
+      <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-700/50 rounded-xl p-5 mb-6 shadow-lg">
+        <h2 className="text-sm font-semibold text-zinc-200 mb-4 flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-green-500"></span>
+          New Rule
+        </h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelCls}>Port</label>
@@ -254,10 +260,10 @@ export function RulesTab() {
             />
           </div>
 
-          {error && <p className="col-span-2 text-red-400 text-xs">{error}</p>}
+          {error && <p className="col-span-2 text-red-400 text-xs bg-red-950/30 border border-red-900/50 rounded-lg px-3 py-2">{error}</p>}
 
           <div className="col-span-2 flex justify-end">
-            <button type="submit" className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition-colors">
+            <button type="submit" className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-lg shadow-purple-900/20">
               Add / Update Rule
             </button>
           </div>
@@ -265,7 +271,10 @@ export function RulesTab() {
       </div>
 
       {/* Rules list */}
-      <h2 className="text-sm font-semibold text-gray-300 mb-2">Active Rules</h2>
+      <h2 className="text-sm font-semibold text-zinc-200 mb-3 flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+        Active Rules
+      </h2>
       {rules.length === 0 ? (
         <p className="text-gray-500 text-sm">No rules configured.</p>
       ) : (
@@ -273,33 +282,33 @@ export function RulesTab() {
           {rules.map(rule => (
             <div
               key={rule.port}
-              className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 flex items-center justify-between gap-4"
+              className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-700/50 rounded-xl px-5 py-3 flex items-center justify-between gap-4 shadow-md hover:border-zinc-600/50 transition-colors"
             >
               <div className="grid grid-cols-5 gap-4 flex-1 text-sm">
                 <div>
-                  <span className="text-gray-500 text-xs block">Port</span>
-                  <span className="font-mono text-white">{rule.port}</span>
+                  <span className="text-zinc-500 text-xs block">Port</span>
+                  <span className="font-mono text-white font-medium">{rule.port}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs block">Sound</span>
+                  <span className="text-zinc-500 text-xs block">Sound</span>
                   <span className="text-white capitalize">{rule.sound ?? 'synth'}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs block">Note</span>
+                  <span className="text-zinc-500 text-xs block">Note</span>
                   <span className="text-white">{rule.sound_type}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs block">Boost</span>
+                  <span className="text-zinc-500 text-xs block">Boost</span>
                   <span className="text-white">{rule.frequency_boost.toFixed(1)}×</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs block">IP Whitelist</span>
+                  <span className="text-zinc-500 text-xs block">IP Whitelist</span>
                   <span className="text-white">{rule.ip_whitelist.length > 0 ? rule.ip_whitelist.join(", ") : "all"}</span>
                 </div>
               </div>
               <button
                 onClick={() => handleDelete(rule.port)}
-                className="text-xs text-red-400 hover:text-red-300 border border-red-800 hover:border-red-600 px-3 py-1 rounded transition-colors shrink-0"
+                className="text-xs text-red-400 hover:text-red-300 border border-red-900/50 hover:border-red-700 hover:bg-red-950/30 px-3 py-1.5 rounded-lg transition-all shrink-0"
               >
                 Delete
               </button>

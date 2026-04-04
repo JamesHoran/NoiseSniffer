@@ -3,11 +3,10 @@ import "./App.css";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs";
 import { SpectrumAnalyzer } from "./components/SpectrumAnalyzer";
 import { RulesTab } from "./components/RulesTab";
-// Assuming you have a PacketTable component for the left side of your sketch
-// import { PacketTable } from "./components/PacketTable";
 import { useWebSocket } from "./hooks/useWebSocket";
 import type { PacketMessage, WebSocketMessage } from "./hooks/useWebSocket";
 import PacketStream from "./components/PacketStream";
+import { Activity, Database, Settings, Shield } from "lucide-react";
 
 const WS_URL = "ws://localhost:8000/ws";
 
@@ -61,18 +60,27 @@ function App() {
     <>
       <section id="center">
         {/* Header with connection status */}
-        <div className="mb-4 flex items-center justify-between px-4">
-          <h1 className="text-2xl font-bold text-white">NoiseSniffer</h1>
+        <div className="mb-6 flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <span className={`text-sm font-medium flex items-center gap-2 ${isConnected ? "text-green-400" : "text-red-400"}`}>
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-900/30">
+              <Activity className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">NoiseSniffer</h1>
+              <p className="text-xs text-zinc-500">Real-time network audio visualization</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className={`text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-lg ${isConnected ? "text-green-400 bg-green-950/30 border border-green-900/50" : "text-red-400 bg-red-950/30 border border-red-900/50"}`}>
               <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-400 animate-pulse" : "bg-red-400"}`}></span>
               {isConnected ? "Live" : "Disconnected"}
             </span>
-            <span className="text-xs text-gray-500">{WS_URL}</span>
             <button
               onClick={toggleMute}
-              className={`text-xs px-3 py-1 rounded border transition-colors ${
-                isMuted ? "border-red-700 text-red-400 hover:border-red-500" : "border-gray-600 text-gray-300 hover:border-gray-400"
+              className={`text-xs px-3 py-2 rounded-lg border font-medium transition-all ${
+                isMuted
+                  ? "border-red-900/50 text-red-400 hover:border-red-700 hover:bg-red-950/30"
+                  : "border-zinc-700 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50"
               }`}
             >
               {isMuted ? "Unmute" : "Mute"}
@@ -80,26 +88,25 @@ function App() {
           </div>
         </div>
 
-        <Tabs defaultValue="tab1">
+        <Tabs defaultValue="spectrum">
           <TabsList>
-            <TabsTrigger value="tab1">Spectrum Analyzer</TabsTrigger>
-            <TabsTrigger value="tab2">Packet Stream</TabsTrigger>
-            <TabsTrigger value="tab3">Settings</TabsTrigger>
-            <TabsTrigger value="tab4">Rules</TabsTrigger>
+            <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>Spectrum</TabsTrigger>
+            <TabsTrigger value="packets" icon={<Database className="h-4 w-4" />}>Packets</TabsTrigger>
+            <TabsTrigger value="settings" icon={<Settings className="h-4 w-4" />}>Settings</TabsTrigger>
+            <TabsTrigger value="rules" icon={<Shield className="h-4 w-4" />}>Rules</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="tab1">
-            {/* You would typically place your PacketTable and SpectrumAnalyzer side-by-side here */}
+          <TabsContent value="spectrum">
             <SpectrumAnalyzer spectrumRef={latestSpectrumRef} annotationsRef={latestAnnotationsRef} />
           </TabsContent>
 
-          <TabsContent value="tab2">
+          <TabsContent value="packets">
             <PacketStream />
           </TabsContent>
 
-          <TabsContent value="tab3">{/* ... Settings content remains exactly the same ... */}</TabsContent>
+          <TabsContent value="settings">{/* ... Settings content ... */}</TabsContent>
 
-          <TabsContent value="tab4">
+          <TabsContent value="rules">
             <RulesTab />
           </TabsContent>
         </Tabs>

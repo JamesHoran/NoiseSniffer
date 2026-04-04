@@ -213,10 +213,11 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
       className={`spectrum-analyzer ${className}`}
       data-testid="spectrum-analyzer"
       style={{
-        background: '#111827',
-        borderRadius: '8px',
-        padding: '12px',
-        border: '1px solid #374151',
+        background: 'rgba(24, 24, 27, 0.5)',
+        borderRadius: '12px',
+        padding: '16px',
+        border: '1px solid rgba(63, 63, 70, 0.5)',
+        backdropFilter: 'blur(8px)',
       }}
     >
       <UplotReact

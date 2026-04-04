@@ -37,7 +37,9 @@ const TabsList = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      "inline-flex h-12 items-center justify-center rounded-xl bg-zinc-900/80 p-1.5 text-zinc-400",
+      "border border-zinc-700/50 shadow-lg backdrop-blur-sm",
+      "gap-1",
       className
     )}
     {...props}
@@ -49,8 +51,9 @@ const TabsTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     value: string
+    icon?: React.ReactNode
   }
->(({ className, value: triggerValue, children, ...props }, ref) => {
+>(({ className, value: triggerValue, children, icon, ...props }, ref) => {
   const context = React.useContext(TabsContext)
   if (!context) throw new Error("TabsTrigger must be used within Tabs")
 
@@ -62,13 +65,19 @@ const TabsTrigger = React.forwardRef<
       ref={ref}
       type="button"
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        isActive && "bg-background text-foreground shadow-sm",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap",
+        "rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
+        "disabled:pointer-events-none disabled:opacity-50",
+        isActive
+          ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-900/30"
+          : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50",
         className
       )}
       onClick={() => onValueChange(triggerValue)}
       {...props}
     >
+      {icon && <span className="h-4 w-4">{icon}</span>}
       {children}
     </button>
   )
@@ -92,7 +101,11 @@ const TabsContent = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={cn("mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)}
+      className={cn(
+        "mt-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900",
+        "animate-in fade-in-0 zoom-in-95 duration-200",
+        className
+      )}
       {...props}
     >
       {children}
