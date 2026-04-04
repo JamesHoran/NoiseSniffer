@@ -6,7 +6,7 @@ import { RulesTab } from "./components/RulesTab";
 import { useWebSocket } from "./hooks/useWebSocket";
 import type { PacketMessage, WebSocketMessage } from "./hooks/useWebSocket";
 import PacketStream from "./components/PacketStream";
-import { Activity, Database, Settings, Shield } from "lucide-react";
+import { Activity, Database, Shield } from "lucide-react";
 
 const WS_URL = "ws://localhost:8000/ws";
 
@@ -92,7 +92,6 @@ function App() {
           <TabsList>
             <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>Spectrum</TabsTrigger>
             <TabsTrigger value="packets" icon={<Database className="h-4 w-4" />}>Packets</TabsTrigger>
-            <TabsTrigger value="settings" icon={<Settings className="h-4 w-4" />}>Settings</TabsTrigger>
             <TabsTrigger value="rules" icon={<Shield className="h-4 w-4" />}>Rules</TabsTrigger>
           </TabsList>
 
@@ -103,8 +102,6 @@ function App() {
           <TabsContent value="packets">
             <PacketStream />
           </TabsContent>
-
-          <TabsContent value="settings">{/* ... Settings content ... */}</TabsContent>
 
           <TabsContent value="rules">
             <RulesTab />
