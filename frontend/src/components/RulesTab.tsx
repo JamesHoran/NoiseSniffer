@@ -21,6 +21,41 @@ interface Rule {
   frequency_boost: number;
 }
 
+// ---------------------------------------------------------------------------
+// Presets
+// ---------------------------------------------------------------------------
+// "443 → .138" and "443 → .60" are intentionally separate presets because
+// rules are keyed by port — two rules for port 443 can't coexist.
+
+const PRESETS: Record<string, Rule[]> = {
+  'Current Rules': [
+    { port: 443,  ip_whitelist: [],                 sound: 'piano', sound_type: 'C4',  frequency_boost: 5.0 },
+    { port: 80,   ip_whitelist: [],                 sound: 'synth', sound_type: 'E4',  frequency_boost: 8.0 },
+    { port: 53,   ip_whitelist: [],                 sound: 'piano', sound_type: 'B4',  frequency_boost: 8.0 },
+    { port: 3702, ip_whitelist: [],                 sound: 'synth', sound_type: 'G5',  frequency_boost: 6.0 },
+    { port: 7844, ip_whitelist: [],                 sound: 'synth', sound_type: 'G4',  frequency_boost: 5.0 },
+    { port: 22,   ip_whitelist: [],                 sound: 'piano', sound_type: 'F#5', frequency_boost: 8.0 },
+  ],
+  'Local Only (.138)': [
+    { port: 443,  ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'C4',  frequency_boost: 5.0 },
+    { port: 80,   ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'E4',  frequency_boost: 8.0 },
+    { port: 53,   ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'B4',  frequency_boost: 8.0 },
+    { port: 3702, ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'G5',  frequency_boost: 6.0 },
+    { port: 7844, ip_whitelist: ['172.17.78.138'],  sound: 'synth', sound_type: 'G4',  frequency_boost: 5.0 },
+    { port: 22,   ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'F#5', frequency_boost: 8.0 },
+  ],
+  '443 → .138': [
+    { port: 443,  ip_whitelist: ['172.17.78.138'],  sound: 'piano', sound_type: 'C4',  frequency_boost: 5.0 },
+  ],
+  '443 → .60': [
+    { port: 443,  ip_whitelist: ['172.17.28.60'],   sound: 'piano', sound_type: 'E4',  frequency_boost: 5.0 },
+  ],
+};
+
+const PRESET_NAMES = Object.keys(PRESETS) as (keyof typeof PRESETS)[];
+
+// ---------------------------------------------------------------------------
+
 const EMPTY_FORM = {
   port: '',
   ip_whitelist: '',
@@ -36,6 +71,7 @@ const labelCls = 'block text-xs text-gray-400 mb-1';
 export function RulesTab() {
   const [rules, setRules] = useState<Rule[]>([]);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [selectedPreset, setSelectedPreset] = useState(PRESET_NAMES[0]);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -100,8 +136,55 @@ export function RulesTab() {
     }
   };
 
+  const handleApplyPreset = async () => {
+    setError('');
+    const preset = PRESETS[selectedPreset];
+
+    // Delete all current rules first
+    await Promise.all(rules.map(r =>
+      fetch(`${API}/rules/${r.port}`, { method: 'DELETE' })
+    ));
+
+    // POST each preset rule
+    const results = await Promise.all(preset.map(rule =>
+      fetch(`${API}/rules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rule),
+      }).then(r => r.ok ? r.json() : null)
+    ));
+
+    const saved = results.filter(Boolean) as Rule[];
+    if (saved.length !== preset.length) {
+      setError('Some preset rules failed to apply.');
+    }
+    setRules(saved);
+  };
+
   return (
     <div className="p-4 text-white max-w-2xl">
+
+      {/* Presets */}
+      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-4">
+        <h2 className="text-sm font-semibold text-gray-300 mb-3">Presets</h2>
+        <div className="flex gap-2">
+          <select
+            value={selectedPreset}
+            onChange={e => setSelectedPreset(e.target.value)}
+            className={inputCls}
+          >
+            {PRESET_NAMES.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleApplyPreset}
+            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors shrink-0"
+          >
+            Apply
+          </button>
+        </div>
+      </div>
 
       {/* Add rule form */}
       <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-6">
