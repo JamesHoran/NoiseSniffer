@@ -60,7 +60,7 @@ function App() {
     <>
       {/* Header with connection status - full width */}
       <nav className="sticky top-0 z-50 w-screen left-0 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/50">
-        <div className="max-w-[1126px] mx-auto px-6 py-4">
+        <div className="w-full px-6 py-4">
           <div className="flex items-center justify-between">
           {/* Logo and title */}
           <div className="flex items-center gap-4">
@@ -126,7 +126,7 @@ function App() {
       </nav>
 
       {/* Main content area - constrained width */}
-      <main className="max-w-[1126px] mx-auto px-6 py-6">
+      <main className="w-full px-6 py-6">
         <Tabs defaultValue="spectrum" className="w-full">
           <TabsList>
             <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>
