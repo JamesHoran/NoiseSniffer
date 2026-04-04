@@ -113,6 +113,7 @@ class Rule(BaseModel):
     sound_type: str = "A4"  # musical note: C3–B5 (e.g. A4 = 440 Hz)
     # frequency_hz: float | None = None  # None = use automatic port-based mapping
     frequency_boost: float = 1.0
+    instrument: str = "piano"  # piano, guitar, flute, trumpet, bells, chiptune, synth
 
 
 @app.get("/rules")
