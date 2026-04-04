@@ -6,13 +6,13 @@
 - [+] Install dependencies
 
 ## Step 2: Packet capture
-- [ ] Use Scapy's `sniff()` to capture live packets
-- [ ] Parse each packet into the schema fields: `timestamp`, `src_ip`, `dst_ip`, `src_port`, `dst_port`, `protocol`, `flags`, `length`
-- [ ] Print parsed packets to console to verify
+- [+] Use Scapy's `sniff()` to capture live packets
+- [+] Parse each packet into the schema fields: `timestamp`, `src_ip`, `dst_ip`, `src_port`, `dst_port`, `protocol`, `flags`, `length`
+- [+] Print parsed packets to console to verify
 
 ## Step 3: FastAPI + WebSocket
-- [ ] Stand up a FastAPI server
-- [ ] Add a WebSocket endpoint that streams live packet messages (`type: "packet"`) to the frontend
+- [+] Stand up a FastAPI server
+- [+] Add a WebSocket endpoint that streams live packet messages (`type: "packet"`) to the frontend
 
 ## Step 4: Audio engine
 - [ ] Generate base noise layers with SoundDevice (white noise, wind, forest, fire)
