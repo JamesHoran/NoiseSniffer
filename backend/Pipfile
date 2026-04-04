@@ -10,6 +10,7 @@ uvicorn = "*"
 numpy = "*"
 scipy = "*"
 watchdog = "*"
+python-dotenv = "*"
 sounddevice = "*"
 
 [dev-packages]

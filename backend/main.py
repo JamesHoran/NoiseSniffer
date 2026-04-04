@@ -1,11 +1,14 @@
 import asyncio
 import json
+import os
 import threading
+from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from scapy.all import sniff, conf as scapy_conf
 from sniffer import parse_packet
 
-IFACE = r"\Device\NPF_{D1E60D1D-DACE-48C1-9915-47A46F14DFF0}"
+load_dotenv()
+IFACE = os.environ["IFACE"]  # set in .env
 
 app = FastAPI()
 
