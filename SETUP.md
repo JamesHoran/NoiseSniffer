@@ -24,6 +24,13 @@ pipenv install
 pipenv shell
 ```
 
+### 4. Start the server
+```bash
+uvicorn main:app --reload
+```
+
+WebSocket endpoint: `ws://localhost:8000/ws`
+
 ---
 
 ## Frontend (React)
