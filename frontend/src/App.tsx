@@ -59,9 +59,9 @@ function App() {
   return (
     <>
       {/* Header with connection status - full width */}
-      <nav className="sticky top-0 z-50 w-screen left-0 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/50">
-        <div className="w-full px-6 py-4">
-          <div className="flex items-center justify-between">
+      <nav className="sticky top-0 z-50 w-screen left-0 h-20 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/50">
+        <div className="w-full h-full px-6">
+          <div className="flex items-center justify-between h-full">
           {/* Logo and title */}
           <div className="flex items-center gap-4">
             <div className="relative">
