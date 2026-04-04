@@ -1,5 +1,10 @@
+import os
+from dotenv import load_dotenv
 from scapy.all import sniff, IP, TCP, UDP, ICMP
 from datetime import datetime, timezone
+
+load_dotenv()
+IFACE = os.environ["IFACE"]
 
 
 def parse_packet(packet):
@@ -53,8 +58,6 @@ def handle_packet(packet):
         with open(LOG_FILE, "a") as f:
             f.write(str(parsed) + "\n")
 
-
-IFACE = r"\Device\NPF_{D1E60D1D-DACE-48C1-9915-47A46F14DFF0}"
 
 if __name__ == "__main__":
     timeout = 10
