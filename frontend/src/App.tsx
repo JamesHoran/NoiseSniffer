@@ -6,7 +6,7 @@ import { RulesTab } from "./components/RulesTab";
 // Assuming you have a PacketTable component for the left side of your sketch
 // import { PacketTable } from "./components/PacketTable";
 import { useWebSocket } from "./hooks/useWebSocket";
-import type { SpectrumMessage, PacketMessage } from "./hooks/useWebSocket";
+import type { PacketMessage, WebSocketMessage } from "./hooks/useWebSocket";
 import PacketStream from "./components/PacketStream";
 
 const WS_URL = "ws://localhost:8000/ws";
@@ -23,7 +23,7 @@ function App() {
   const packetBufferRef = useRef<PacketMessage[]>([]);
 
   // 2. Silently update the buffers without re-rendering React
-  const handleMessage = useCallback((message: any) => {
+  const handleMessage = useCallback((message: WebSocketMessage) => {
     if (message.type === "spectrum" && message.bins) {
       latestSpectrumRef.current = message.bins.map(normalizeToDb);
 
@@ -51,7 +51,7 @@ function App() {
     setIsMuted(next);
   };
 
-  const { isConnected } = useWebSocket<any>(WS_URL, {
+  const { isConnected } = useWebSocket<WebSocketMessage>(WS_URL, {
     onMessage: handleMessage,
     reconnectInterval: 3000,
     reconnectAttempts: 10,

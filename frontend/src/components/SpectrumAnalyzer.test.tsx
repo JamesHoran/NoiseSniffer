@@ -54,19 +54,25 @@ import UplotReact from 'uplot-react';
 describe('SpectrumAnalyzer', () => {
   describe('Rendering', () => {
     it('should render the chart container', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
       expect(screen.getByTestId('spectrum-analyzer')).toBeInTheDocument();
     });
 
     it('should render uPlot chart component', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
       expect(screen.getByTestId('uplot-mock')).toBeInTheDocument();
     });
   });
 
   describe('uPlot Configuration', () => {
     it('should configure Y-axis for dB amplitude with range -100 to 0', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       const callArgs = (UplotReact as any).mock.calls[0];
       const options = callArgs[0]?.options;
@@ -76,7 +82,9 @@ describe('SpectrumAnalyzer', () => {
     });
 
     it('should apply dark mode theme styling', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       const callArgs = (UplotReact as any).mock.calls[0];
       const options = callArgs[0]?.options;
@@ -85,7 +93,9 @@ describe('SpectrumAnalyzer', () => {
     });
 
     it('should configure series with fill under line', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       const callArgs = (UplotReact as any).mock.calls[0];
       const options = callArgs[0]?.options;
@@ -96,7 +106,9 @@ describe('SpectrumAnalyzer', () => {
 
   describe('Buffer & Draw Pattern', () => {
     it('should initialize requestAnimationFrame loop', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       expect(mockRaf).toHaveBeenCalled();
     });
@@ -104,16 +116,16 @@ describe('SpectrumAnalyzer', () => {
     it('should use stable data reference for uPlot (Buffer & Draw)', () => {
       // This test verifies the Buffer & Draw pattern by checking that
       // changing the wave data doesn't cause uPlot-react to re-render with new data
-      const { rerender } = render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      const { rerender } = render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       const initialCalls = (UplotReact as any).mock.calls;
       const initialData = initialCalls[0][0]?.data;
 
       // Update with different data (simulating WebSocket update)
-      const newData = {
-        wave: new Array(512).fill(-40).map((v, i) => v - i), // Different values
-      };
-      rerender(<SpectrumAnalyzer data={newData} />);
+      spectrumRef.current = Array(1024).fill(-40).map((v, i) => v - i);
+      rerender(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       // uPlot-react should receive the same data reference because
       // the Buffer & Draw pattern uses a ref (buffer) instead of props
@@ -128,7 +140,9 @@ describe('SpectrumAnalyzer', () => {
 
   describe('Custom Annotations', () => {
     it('should configure draw hook for custom annotations', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       const callArgs = (UplotReact as any).mock.calls[0];
       const options = callArgs[0]?.options;
@@ -137,7 +151,9 @@ describe('SpectrumAnalyzer', () => {
     });
 
     it('should support drawing annotation labels', () => {
-      render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       const callArgs = (UplotReact as any).mock.calls[0];
       const options = callArgs[0]?.options;
@@ -148,7 +164,9 @@ describe('SpectrumAnalyzer', () => {
 
   describe('Lifecycle', () => {
     it('should clean up requestAnimationFrame on unmount', () => {
-      const { unmount } = render(<SpectrumAnalyzer />);
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: [] };
+      const { unmount } = render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
 
       unmount();
 
@@ -157,23 +175,24 @@ describe('SpectrumAnalyzer', () => {
   });
 
   describe('Data Flow', () => {
-    it('should accept wave data via props', () => {
-      const testData = {
-        wave: new Array(512).fill(-30),
-        annotations: [],
-      };
+    it('should accept spectrum data via ref', () => {
+      const testData = new Array(512).fill(-30);
+      const spectrumRef = { current: testData };
+      const annotationsRef = { current: [] };
 
-      render(<SpectrumAnalyzer data={testData} />);
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
       expect(screen.getByTestId('spectrum-analyzer')).toBeInTheDocument();
     });
 
-    it('should accept annotations configuration', () => {
+    it('should accept annotations configuration via ref', () => {
       const annotations = [
         { label: 'ARP', frequency: 100 },
         { label: 'HTTPS', frequency: 443 },
       ];
+      const spectrumRef = { current: Array(1024).fill(-100) };
+      const annotationsRef = { current: annotations };
 
-      render(<SpectrumAnalyzer annotations={annotations} />);
+      render(<SpectrumAnalyzer spectrumRef={spectrumRef} annotationsRef={annotationsRef} />);
       expect(screen.getByTestId('spectrum-analyzer')).toBeInTheDocument();
     });
   });

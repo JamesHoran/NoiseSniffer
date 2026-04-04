@@ -10,8 +10,8 @@ export interface Annotation {
 
 export interface SpectrumAnalyzerProps {
   // Accept Refs instead of raw data to bypass React re-renders!
-  spectrumRef: React.MutableRefObject<number[]>;
-  annotationsRef: React.MutableRefObject<Annotation[]>;
+  spectrumRef: React.RefObject<number[]>;
+  annotationsRef: React.RefObject<Annotation[]>;
   className?: string;
 }
 
@@ -61,30 +61,29 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
     });
 
     ctx.restore();
-  }, []);
+  }, [annotationsRef]);
 
-  // 2. The true zero-render animation loop
-  const drawLoop = useCallback(() => {
-    if (chartRef.current && spectrumRef.current) {
-      // Read data straight from the parent's ref buffer
-      const xData = new Float64Array(generateFrequencyBins(spectrumRef.current.length));
-      const yData = new Float64Array(spectrumRef.current);
-
-      chartRef.current.setData([xData, yData]);
-    }
-
-    rafIdRef.current = requestAnimationFrame(drawLoop);
-  }, [spectrumRef]);
-
-  // 3. Start the loop on mount
+  // 2. Setup draw loop in effect only (not during render)
   useEffect(() => {
+    const drawLoop = () => {
+      if (chartRef.current && spectrumRef.current) {
+        // Read data straight from the parent's ref buffer
+        const xData = new Float64Array(generateFrequencyBins(spectrumRef.current.length));
+        const yData = new Float64Array(spectrumRef.current);
+
+        chartRef.current.setData([xData, yData]);
+      }
+
+      rafIdRef.current = requestAnimationFrame(drawLoop);
+    };
+
     drawLoop();
     return () => {
       if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
       }
     };
-  }, [drawLoop]);
+  }, [spectrumRef]);
 
   const options = useMemo<uPlot.Options>(() => ({
     width: 800,
@@ -202,15 +201,17 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
     },
   }), [drawAnnotations]);
 
+  // Initialize data once - avoid accessing ref in render
   const initialData = useMemo(() => {
     const xData = new Float64Array(generateFrequencyBins(DEFAULT_BINS));
-    const yData = new Float64Array(spectrumRef.current || Array(DEFAULT_BINS).fill(-100));
+    const yData = new Float64Array(Array(DEFAULT_BINS).fill(-100));
     return [xData, yData];
-  }, [spectrumRef]);
+  }, []);
 
   return (
     <div
       className={`spectrum-analyzer ${className}`}
+      data-testid="spectrum-analyzer"
       style={{
         background: '#111827',
         borderRadius: '8px',
