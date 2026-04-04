@@ -1,0 +1,23 @@
+[
+  {
+    "port": 443,
+    "ip_whitelist": [],
+    "sound_type": "fire",
+    "frequency_hz": 5000.0,
+    "frequency_boost": 10.0
+  },
+  {
+    "port": 53,
+    "ip_whitelist": [],
+    "sound_type": "synth",
+    "frequency_hz": 8000.0,
+    "frequency_boost": 10.0
+  },
+  {
+    "port": 80,
+    "ip_whitelist": [],
+    "sound_type": "rain",
+    "frequency_hz": 10000.0,
+    "frequency_boost": 10.0
+  }
+]

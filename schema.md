@@ -48,6 +48,6 @@ Sent at ~30fps for the spectrum analyzer (Tab 2).
 }
 ```
 - `ip_whitelist`: list of IPs this rule applies to; empty list `[]` means all IPs
-- `sound_type`: `"white_noise"`, `"fire"`, `"synth"`, `"rain"`, or `"wind"`
+- `sound_type`: `"white_noise"`, `"fire"`, `"rain"`, or `"wind"`
 - `frequency_hz`: centre frequency (Hz) of the bandpass EQ filter; omit to use automatic port-based mapping
 - `frequency_boost`: amplitude multiplier for this band (1.0 = neutral)

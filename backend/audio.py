@@ -1,5 +1,4 @@
 import queue
-import time
 from pathlib import Path
 
 import numpy as np
@@ -12,8 +11,7 @@ SAMPLE_RATE = 44100
 BLOCK_SIZE = 512
 
 NOISE_AMPLITUDE = 0.08       # base white noise level
-BURST_AMPLITUDE = 0.2        # base amplitude for sound bursts
-DISTORTION_THRESHOLD = 50    # packets/sec before distortion kicks in
+BURST_AMPLITUDE = 1.0        # base amplitude for sound bursts
 
 FFT_SIZE = 2048
 NUM_BINS = 1024
@@ -23,7 +21,7 @@ DB_MIN, DB_MAX = -60.0, 0.0
 _HANN = np.hanning(FFT_SIZE)
 
 SOUNDS_DIR = Path(__file__).parent / "sounds"
-SOUND_NAMES = ["fire", "synth", "rain", "wind"]
+SOUND_NAMES = ["fire", "rain", "wind"]
 
 # Loaded sound buffers: sound_type -> float32 mono array normalised to [-1, 1]
 _sound_buffers: dict[str, np.ndarray] = {}
@@ -167,10 +165,8 @@ class AudioEngine:
     def __init__(self):
         # SimpleQueue is lock-free and safe to write from any thread.
         self._new_bursts: queue.SimpleQueue[_SoundBurst] = queue.SimpleQueue()
-        self._new_timestamps: queue.SimpleQueue[float] = queue.SimpleQueue()
         # Only touched inside the audio callback thread.
         self._active_bursts: list[_SoundBurst] = []
-        self._packet_times: deque[float] = deque()
         self._stream: sd.OutputStream | None = None
         # Port-keyed rules — replaced atomically (GIL-safe).
         self._rules: dict[int, dict] = {}
@@ -217,10 +213,9 @@ class AudioEngine:
 
         sound_type = rule.get("sound_type", "white_noise") if rule else "white_noise"
         boost      = rule.get("frequency_boost", 1.0) if rule else 1.0
-        center_hz  = rule.get("frequency_hz") or _freq_for_packet(parsed)
+        center_hz  = (rule.get("frequency_hz") if rule else None) or _freq_for_packet(parsed)
 
         self._new_bursts.put(_SoundBurst(sound_type, center_hz, boost))
-        self._new_timestamps.put(time.monotonic())
 
     def _callback(self, outdata, frames, time_info, status):
         """Called by sounddevice on its own audio thread to fill each output buffer."""
@@ -231,13 +226,6 @@ class AudioEngine:
         # Drain incoming bursts
         while not self._new_bursts.empty():
             self._active_bursts.append(self._new_bursts.get_nowait())
-
-        # Update rolling 1-second packet rate window
-        now = time.monotonic()
-        while not self._new_timestamps.empty():
-            self._packet_times.append(self._new_timestamps.get_nowait())
-        while self._packet_times and now - self._packet_times[0] > 1.0:
-            self._packet_times.popleft()
 
         # Base white noise layer
         signal = (np.random.randn(frames) * NOISE_AMPLITUDE).astype(np.float32)
@@ -251,13 +239,6 @@ class AudioEngine:
                 dead.append(i)
         for i in reversed(dead):
             self._active_bursts.pop(i)
-
-        # Waveshaping distortion on packet rate spike
-        rate = len(self._packet_times)
-        if rate > DISTORTION_THRESHOLD:
-            excess = min((rate - DISTORTION_THRESHOLD) / DISTORTION_THRESHOLD, 1.0)
-            gain = 1.0 + excess * 4.0
-            signal = np.tanh(signal * gain)
 
         outdata[:, 0] = np.clip(signal, -1.0, 1.0)
 

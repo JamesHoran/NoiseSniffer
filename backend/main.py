@@ -110,7 +110,7 @@ async def set_mute(body: MuteRequest):
 class Rule(BaseModel):
     port: int
     ip_whitelist: list[str] = []
-    sound_type: str = "white_noise"  # white_noise | fire | synth | rain | wind
+    sound_type: str = "white_noise"  # white_noise | fire | rain | wind
     frequency_hz: float | None = None  # None = use automatic port-based mapping
     frequency_boost: float = 1.0
 

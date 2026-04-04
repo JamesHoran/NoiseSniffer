@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 const API = 'http://localhost:8000';
 
-const SOUND_TYPES = ['white_noise', 'fire', 'synth', 'rain', 'wind'] as const;
+const SOUND_TYPES = ['white_noise', 'fire', 'rain', 'wind'] as const;
 type SoundType = typeof SOUND_TYPES[number];
 
 interface Rule {
