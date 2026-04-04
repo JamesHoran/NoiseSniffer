@@ -1,38 +1,38 @@
 [
   {
-    "port": 443,
-    "ip_whitelist": [],
-    "sound_type": "C4",
-    "frequency_boost": 5.0
-  },
-  {
-    "port": 80,
-    "ip_whitelist": [],
-    "sound_type": "E4",
-    "frequency_boost": 8.0
-  },
-  {
-    "port": 53,
-    "ip_whitelist": [],
-    "sound_type": "B4",
-    "frequency_boost": 8.0
-  },
-  {
     "port": 3702,
-    "ip_whitelist": [],
+    "ip_whitelist": [
+      "172.17.78.138"
+    ],
+    "sound": "synth",
     "sound_type": "G5",
     "frequency_boost": 6.0
   },
   {
+    "port": 80,
+    "ip_whitelist": [
+      "172.17.78.138"
+    ],
+    "sound": "synth",
+    "sound_type": "E4",
+    "frequency_boost": 8.0
+  },
+  {
     "port": 7844,
-    "ip_whitelist": [],
+    "ip_whitelist": [
+      "172.17.78.138"
+    ],
+    "sound": "synth",
     "sound_type": "G4",
     "frequency_boost": 5.0
   },
   {
     "port": 22,
-    "ip_whitelist": [],
-    "sound_type": "B3",
-    "frequency_boost": 4.0
+    "ip_whitelist": [
+      "172.17.78.138"
+    ],
+    "sound": "piano",
+    "sound_type": "F#5",
+    "frequency_boost": 8.0
   }
 ]
