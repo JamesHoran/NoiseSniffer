@@ -6,7 +6,8 @@ name = "pypi"
 [packages]
 scapy = "*"
 fastapi = "*"
-uvicorn = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+websockets = "*"
 numpy = "*"
 scipy = "*"
 watchdog = "*"

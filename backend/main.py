@@ -62,6 +62,7 @@ async def startup():
 
     # Launch the broadcast loop as a background async task.
     asyncio.create_task(_broadcast_loop())
+    asyncio.create_task(_spectrum_loop())
 
 
 async def _broadcast_loop():
@@ -81,6 +82,25 @@ async def _broadcast_loop():
 
         # Feed the packet into the audio engine.
         audio_engine.on_packet(json.loads(message))
+
+
+async def _spectrum_loop():
+    """Broadcasts the latest FFT spectrum to all clients at ~30fps."""
+    while True:
+        await asyncio.sleep(1 / 30)
+        bins = audio_engine.latest_spectrum
+        if bins is None:
+            continue
+        message = json.dumps({"type": "spectrum", "bins": bins})
+        async with _clients_lock:
+            dead = set()
+            for ws in _clients:
+                try:
+                    await ws.send_text(message)
+                except Exception:
+                    dead.add(ws)
+            for ws in dead:
+                _clients.discard(ws)
 
 
 @app.websocket("/ws")

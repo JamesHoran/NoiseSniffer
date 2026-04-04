@@ -20,8 +20,8 @@
 - [+] Drive distortion when packet rate spikes (DoS/SYN flood detection)
 
 ## Step 5: Spectrum data
-- [ ] Compute FFT on the audio buffer in real time (NumPy)
-- [ ] Send `type: "spectrum"` messages over the WebSocket at ~30fps
+- [+] Compute FFT on the audio buffer in real time (NumPy)
+- [+] Send `type: "spectrum"` messages over the WebSocket at ~30fps
 
 ## Step 6: Rules
 - [ ] Add `POST /rules` REST endpoint to FastAPI

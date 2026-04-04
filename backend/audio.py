@@ -11,6 +11,25 @@ NOISE_AMPLITUDE = 0.08       # base white noise level
 TONE_AMPLITUDE = 0.15        # per-packet sine burst level
 DISTORTION_THRESHOLD = 50    # packets/sec before distortion kicks in
 
+FFT_SIZE = 2048              # samples per FFT frame
+NUM_BINS = 64                # frequency bands sent to the frontend
+SPECTRUM_INTERVAL = SAMPLE_RATE // 30  # emit a new spectrum every ~33ms
+DB_MIN, DB_MAX = -60.0, 0.0  # dB range mapped to 0.0–1.0
+
+_HANN = np.hanning(FFT_SIZE)  # pre-computed window
+
+
+def _compute_spectrum(samples: np.ndarray) -> list[float]:
+    """FFT → dB → normalised [0,1] → downsampled to NUM_BINS."""
+    magnitude = np.abs(np.fft.rfft(samples * _HANN)) / FFT_SIZE
+    db = 20 * np.log10(magnitude + 1e-10)
+    normalised = np.clip((db - DB_MIN) / (DB_MAX - DB_MIN), 0.0, 1.0)
+    # rfft gives FFT_SIZE//2 + 1 bins; average down to NUM_BINS
+    usable = normalised[:FFT_SIZE // 2]
+    factor = len(usable) // NUM_BINS
+    bins = usable[: factor * NUM_BINS].reshape(NUM_BINS, factor).mean(axis=1)
+    return bins.tolist()
+
 
 def _freq_for_packet(parsed: dict) -> float:
     """Map a parsed packet to a sine burst frequency."""
@@ -71,6 +90,10 @@ class AudioEngine:
         self._active_tones: list[_Tone] = []
         self._packet_times: deque[float] = deque()
         self._stream: sd.OutputStream | None = None
+        # Spectrum — written by callback thread, read by main thread (GIL makes the assignment atomic).
+        self._sample_buffer: deque[float] = deque(maxlen=FFT_SIZE)
+        self._samples_since_spectrum: int = 0
+        self.latest_spectrum: list[float] | None = None
 
     def start(self):
         self._stream = sd.OutputStream(
@@ -127,6 +150,13 @@ class AudioEngine:
             signal = np.tanh(signal * gain)
 
         outdata[:, 0] = np.clip(signal, -1.0, 1.0)
+
+        # Accumulate output samples and emit a spectrum frame at ~30fps.
+        self._sample_buffer.extend(outdata[:, 0].tolist())
+        self._samples_since_spectrum += frames
+        if self._samples_since_spectrum >= SPECTRUM_INTERVAL and len(self._sample_buffer) == FFT_SIZE:
+            self.latest_spectrum = _compute_spectrum(np.array(self._sample_buffer, dtype=np.float32))
+            self._samples_since_spectrum = 0
 
 
 engine = AudioEngine()
