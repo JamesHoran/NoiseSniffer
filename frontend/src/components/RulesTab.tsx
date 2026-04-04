@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react';
 
 const API = 'http://localhost:8000';
 
-const SOUND_TYPES = ['white_noise', 'fire', 'rain', 'wind'] as const;
-type SoundType = typeof SOUND_TYPES[number];
+const NOTES = [
+  'C3','D3','E3','F3','G3','A3','B3',
+  'C4','D4','E4','F4','G4','A4','B4',
+  'C5','D5','E5','F5','G5','A5','B5',
+] as const;
+type SoundType = typeof NOTES[number];
 
 interface Rule {
   port: number;
@@ -16,7 +20,7 @@ interface Rule {
 const EMPTY_FORM = {
   port: '',
   ip_whitelist: '',
-  sound_type: 'white_noise' as SoundType,
+  sound_type: 'A4' as SoundType,
   frequency_hz: '',
   frequency_boost: '1.0',
 };
@@ -56,7 +60,7 @@ export function RulesTab() {
         ? form.ip_whitelist.split(',').map(s => s.trim()).filter(Boolean)
         : [],
       sound_type: form.sound_type,
-      frequency_hz: form.frequency_hz ? parseFloat(form.frequency_hz) : null,
+      frequency_hz: null, // frequency_hz: form.frequency_hz ? parseFloat(form.frequency_hz) : null,
       frequency_boost: parseFloat(form.frequency_boost) || 1.0,
     };
 
@@ -112,14 +116,15 @@ export function RulesTab() {
           </div>
 
           <div>
-            <label className={labelCls}>Sound Type</label>
+            <label className={labelCls}>Note</label>
             <select value={form.sound_type} onChange={set('sound_type')} className={inputCls}>
-              {SOUND_TYPES.map(t => (
+              {NOTES.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
           </div>
 
+          {/* Frequency field commented out
           <div>
             <label className={labelCls}>Frequency <span className="text-gray-500">(Hz, empty = auto)</span></label>
             <input
@@ -130,6 +135,7 @@ export function RulesTab() {
               className={inputCls}
             />
           </div>
+          */}
 
           <div>
             <label className={labelCls}>Frequency Boost <span className="text-gray-500">(1.0 = neutral)</span></label>
@@ -178,19 +184,19 @@ export function RulesTab() {
               key={rule.port}
               className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 flex items-center justify-between gap-4"
             >
-              <div className="grid grid-cols-5 gap-4 flex-1 text-sm">
+              <div className="grid grid-cols-4 gap-4 flex-1 text-sm">
                 <div>
                   <span className="text-gray-500 text-xs block">Port</span>
                   <span className="font-mono text-white">{rule.port}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500 text-xs block">Sound</span>
+                  <span className="text-gray-500 text-xs block">Note</span>
                   <span className="text-white">{rule.sound_type}</span>
                 </div>
-                <div>
+                {/* <div>
                   <span className="text-gray-500 text-xs block">Frequency</span>
                   <span className="text-white">{rule.frequency_hz ? `${rule.frequency_hz} Hz` : 'auto'}</span>
-                </div>
+                </div> */}
                 <div>
                   <span className="text-gray-500 text-xs block">Boost</span>
                   <span className="text-white">{rule.frequency_boost.toFixed(1)}×</span>
