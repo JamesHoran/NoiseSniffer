@@ -71,21 +71,24 @@ export default function PacketStream() {
   });
 
   return (
-    <div style={{ padding: "20px", backgroundColor: "#1e1e1e", color: "#fff", borderRadius: "8px" }}>
-      <div style={{ marginBottom: "10px" }}>
-        <strong>Status:</strong>{" "}
-        <span style={{ color: isConnected ? "#00ffcc" : "#ff4444" }}>
-          {isConnected ? "Connected" : "Disconnected"}
+    <div className="p-5 bg-zinc-900/50 backdrop-blur-sm border border-zinc-700/50 rounded-xl shadow-lg">
+      <div className="mb-4 flex items-center gap-2">
+        <span className="text-sm font-medium text-zinc-300">Packet Stream</span>
+        <span className="ml-auto text-xs flex items-center gap-2 px-3 py-1 rounded-lg bg-zinc-800/50 border border-zinc-700/50">
+          <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-400 animate-pulse" : "bg-red-400"}`}></span>
+          <span className={isConnected ? "text-green-400" : "text-red-400"}>
+            {isConnected ? "Connected" : "Disconnected"}
+          </span>
         </span>
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+      <table className="w-full border-collapse text-left">
         {/* 5. Header Mapping */}
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} style={{ borderBottom: "2px solid #444" }}>
+            <tr key={headerGroup.id} className="border-b-2 border-zinc-700/50">
               {headerGroup.headers.map((header) => (
-                <th key={header.id} style={{ padding: "8px" }}>
+                <th key={header.id} className="px-3 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                   {flexRender(header.column.columnDef.header, header.getContext())}
                 </th>
               ))}
@@ -96,9 +99,9 @@ export default function PacketStream() {
         {/* 6. Body Mapping */}
         <tbody>
           {table.getRowModel().rows.map((row) => (
-            <tr key={row.id} style={{ borderBottom: "1px solid #333" }}>
+            <tr key={row.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} style={{ padding: "8px", fontFamily: "monospace", fontSize: "13px" }}>
+                <td key={cell.id} className="px-3 py-2 font-mono text-sm text-zinc-300">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -108,7 +111,7 @@ export default function PacketStream() {
           {/* Show a placeholder if no data has arrived yet */}
           {data.length === 0 && (
             <tr>
-              <td colSpan={columns.length} style={{ padding: "15px", textAlign: "center", color: "#888" }}>
+              <td colSpan={columns.length} className="px-3 py-8 text-center text-zinc-500">
                 Waiting for packets...
               </td>
             </tr>
