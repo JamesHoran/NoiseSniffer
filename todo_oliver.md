@@ -15,9 +15,9 @@
 - [+] Add a WebSocket endpoint that streams live packet messages (`type: "packet"`) to the frontend
 
 ## Step 4: Audio engine
-- [ ] Generate base noise layers with SoundDevice (white noise, wind, forest, fire)
-- [ ] Apply per-packet frequency boosts using NumPy/SciPy
-- [ ] Drive distortion when packet rate spikes (DoS/SYN flood detection)
+- [+] Generate base noise layer with SoundDevice (white noise; wind/forest/fire sample files to be added later)
+- [+] Apply per-packet frequency boosts using NumPy/SciPy
+- [+] Drive distortion when packet rate spikes (DoS/SYN flood detection)
 
 ## Step 5: Spectrum data
 - [ ] Compute FFT on the audio buffer in real time (NumPy)
