@@ -7,6 +7,7 @@ import { RulesTab } from "./components/RulesTab";
 // import { PacketTable } from "./components/PacketTable";
 import { useWebSocket } from "./hooks/useWebSocket";
 import type { SpectrumMessage, PacketMessage } from "./hooks/useWebSocket";
+import PacketStream from "./components/PacketStream";
 
 const WS_URL = "ws://localhost:8000/ws";
 
@@ -25,12 +26,11 @@ function App() {
   const handleMessage = useCallback((message: any) => {
     if (message.type === "spectrum" && message.bins) {
       latestSpectrumRef.current = message.bins.map(normalizeToDb);
-      
+
       if (message.annotations) {
         latestAnnotationsRef.current = message.annotations;
       }
-    } 
-    else if (message.type === "packet") {
+    } else if (message.type === "packet") {
       // Add new packet to the front, and keep only the last 100 to prevent memory leaks
       packetBufferRef.current.unshift(message);
       if (packetBufferRef.current.length > 100) {
@@ -64,21 +64,15 @@ function App() {
         <div className="mb-4 flex items-center justify-between px-4">
           <h1 className="text-2xl font-bold text-white">NoiseSniffer</h1>
           <div className="flex items-center gap-3">
-            <span className={`text-sm font-medium flex items-center gap-2 ${
-              isConnected ? "text-green-400" : "text-red-400"
-            }`}>
+            <span className={`text-sm font-medium flex items-center gap-2 ${isConnected ? "text-green-400" : "text-red-400"}`}>
               <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-400 animate-pulse" : "bg-red-400"}`}></span>
               {isConnected ? "Live" : "Disconnected"}
             </span>
-            <span className="text-xs text-gray-500">
-              {WS_URL}
-            </span>
+            <span className="text-xs text-gray-500">{WS_URL}</span>
             <button
               onClick={toggleMute}
               className={`text-xs px-3 py-1 rounded border transition-colors ${
-                isMuted
-                  ? "border-red-700 text-red-400 hover:border-red-500"
-                  : "border-gray-600 text-gray-300 hover:border-gray-400"
+                isMuted ? "border-red-700 text-red-400 hover:border-red-500" : "border-gray-600 text-gray-300 hover:border-gray-400"
               }`}
             >
               {isMuted ? "Unmute" : "Mute"}
@@ -89,23 +83,23 @@ function App() {
         <Tabs defaultValue="tab1">
           <TabsList>
             <TabsTrigger value="tab1">Spectrum Analyzer</TabsTrigger>
-            <TabsTrigger value="tab2">Settings</TabsTrigger>
-            <TabsTrigger value="tab3">Rules</TabsTrigger>
+            <TabsTrigger value="tab2">Packet Stream</TabsTrigger>
+            <TabsTrigger value="tab3">Settings</TabsTrigger>
+            <TabsTrigger value="tab4">Rules</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="tab1">
-             {/* You would typically place your PacketTable and SpectrumAnalyzer side-by-side here */}
-            <SpectrumAnalyzer
-              spectrumRef={latestSpectrumRef}
-              annotationsRef={latestAnnotationsRef}
-            />
+            {/* You would typically place your PacketTable and SpectrumAnalyzer side-by-side here */}
+            <SpectrumAnalyzer spectrumRef={latestSpectrumRef} annotationsRef={latestAnnotationsRef} />
           </TabsContent>
 
           <TabsContent value="tab2">
-             {/* ... Settings content remains exactly the same ... */}
+            <PacketStream />
           </TabsContent>
 
-          <TabsContent value="tab3">
+          <TabsContent value="tab3">{/* ... Settings content remains exactly the same ... */}</TabsContent>
+
+          <TabsContent value="tab4">
             <RulesTab />
           </TabsContent>
         </Tabs>

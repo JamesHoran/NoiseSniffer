@@ -14,6 +14,7 @@
     "test:run": "vitest run"
   },
   "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
     "autoprefixer": "^10.4.27",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
