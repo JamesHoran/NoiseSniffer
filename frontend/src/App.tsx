@@ -58,9 +58,10 @@ function App() {
 
   return (
     <>
-      {/* Header with connection status */}
-      <nav className="sticky top-0 z-50 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/50">
-        <div className="flex items-center justify-between px-6 py-4">
+      {/* Header with connection status - full width */}
+      <nav className="sticky top-0 z-50 w-screen left-0 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800/50">
+        <div className="max-w-[1126px] mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
           {/* Logo and title */}
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -70,13 +71,9 @@ function App() {
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-white tracking-tight">
                 NoiseSniffer
-                <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                  v1.0
-                </span>
               </h1>
-              <p className="text-sm text-zinc-400">Real-time network audio visualization</p>
             </div>
           </div>
 
@@ -124,11 +121,12 @@ function App() {
               )}
             </button>
           </div>
+          </div>
         </div>
       </nav>
 
-      {/* Main content area */}
-      <main id="center" className="px-6 py-6">
+      {/* Main content area - constrained width */}
+      <main className="max-w-[1126px] mx-auto px-6 py-6">
         <Tabs defaultValue="spectrum" className="w-full">
           <TabsList>
             <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>

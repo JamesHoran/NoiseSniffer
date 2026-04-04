@@ -165,7 +165,7 @@ export function RulesTab() {
   };
 
   return (
-    <div className="p-4 text-white max-w-2xl">
+    <div className="p-4 text-white">
 
       {/* Presets */}
       <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-700/50 rounded-xl p-5 mb-4 shadow-lg">
