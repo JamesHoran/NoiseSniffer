@@ -32,7 +32,7 @@ Crazy stretch goal: UI is fully accessible for the blind. Voice activated rules.
 
 Python (backend)
 Scapy (for parsing network packets)
-PyAudio (Generate noise + apply filters in real time)
+SoundDevice (Generate noise + apply filters in real time)
 NumPy (signal processing)
 SciPy (filters)
 React (front-end)

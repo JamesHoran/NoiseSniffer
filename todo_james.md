@@ -1,8 +1,8 @@
 # James's TODO (Frontend — React)
 
 ## Step 1: Project setup
-- [ ] Scaffold React app (`npx create-react-app` or Vite) in `frontend/`
-- [ ] Install dependencies (charting library TBD for Tab 2)
+- [ ] Scaffold React app (`pnpm create vite`) in `noise-sniffer/`
+- [ ] Install dependencies with `pnpm install` (charting library TBD for Tab 2)
 
 ## Step 2: Tab shell
 - [ ] Build three-tab layout: Packet Stream, Spectrum Analyzer, Rules Editor

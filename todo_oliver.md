@@ -2,7 +2,7 @@
 
 ## Step 1: Project setup
 - [ ] Create `backend/` folder and virtual environment
-- [ ] Create `requirements.txt` with: `scapy`, `fastapi`, `uvicorn`, `numpy`, `scipy`, `pyaudio`, `watchdog`
+- [ ] Create `Pipfile` and `Pipfile.lock` with: `scapy`, `fastapi`, `uvicorn`, `numpy`, `scipy`, `sounddevice`, `watchdog`
 - [ ] Install dependencies
 
 ## Step 2: Packet capture
@@ -15,7 +15,7 @@
 - [ ] Add a WebSocket endpoint that streams live packet messages (`type: "packet"`) to the frontend
 
 ## Step 4: Audio engine
-- [ ] Generate base noise layers with PyAudio (white noise, wind, forest, fire)
+- [ ] Generate base noise layers with SoundDevice (white noise, wind, forest, fire)
 - [ ] Apply per-packet frequency boosts using NumPy/SciPy
 - [ ] Drive distortion when packet rate spikes (DoS/SYN flood detection)
 
