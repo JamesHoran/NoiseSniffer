@@ -58,41 +58,48 @@ function App() {
 
   return (
     <>
-      <section id="center">
-        {/* Header with connection status */}
-        <div className="mb-6 flex items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-900/30">
-              <Activity className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">NoiseSniffer</h1>
-              <p className="text-xs text-zinc-500">Real-time network audio visualization</p>
-            </div>
+      {/* Header with connection status */}
+      <nav className="mb-6 flex items-center justify-between px-4 border-b 1px zinc-500">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-900/30">
+            <Activity className="h-5 w-5 text-white" />
           </div>
-          <div className="flex items-center gap-3">
-            <span className={`text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-lg ${isConnected ? "text-green-400 bg-green-950/30 border border-green-900/50" : "text-red-400 bg-red-950/30 border border-red-900/50"}`}>
-              <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-400 animate-pulse" : "bg-red-400"}`}></span>
-              {isConnected ? "Live" : "Disconnected"}
-            </span>
-            <button
-              onClick={toggleMute}
-              className={`text-xs px-3 py-2 rounded-lg border font-medium transition-all ${
-                isMuted
-                  ? "border-red-900/50 text-red-400 hover:border-red-700 hover:bg-red-950/30"
-                  : "border-zinc-700 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50"
-              }`}
-            >
-              {isMuted ? "Unmute" : "Mute"}
-            </button>
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">NoiseSniffer</h1>
+            <p className="text-xs text-zinc-500">Real-time network audio visualization</p>
           </div>
         </div>
-
+        <div className="flex items-center gap-3">
+          <span
+            className={`text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-lg ${isConnected ? "text-green-400 bg-green-950/30 border border-green-900/50" : "text-red-400 bg-red-950/30 border border-red-900/50"}`}
+          >
+            <span className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-400 animate-pulse" : "bg-red-400"}`}></span>
+            {isConnected ? "Live" : "Disconnected"}
+          </span>
+          <button
+            onClick={toggleMute}
+            className={`text-xs px-3 py-2 rounded-lg border font-medium transition-all ${
+              isMuted
+                ? "border-red-900/50 text-red-400 hover:border-red-700 hover:bg-red-950/30"
+                : "border-zinc-700 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50"
+            }`}
+          >
+            {isMuted ? "Unmute" : "Mute"}
+          </button>
+        </div>
+      </nav>
+      <main id="center" className="border-x border-solid border-[#333]">
         <Tabs defaultValue="spectrum">
           <TabsList>
-            <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>Spectrum</TabsTrigger>
-            <TabsTrigger value="packets" icon={<Database className="h-4 w-4" />}>Packets</TabsTrigger>
-            <TabsTrigger value="rules" icon={<Shield className="h-4 w-4" />}>Rules</TabsTrigger>
+            <TabsTrigger value="spectrum" icon={<Activity className="h-4 w-4" />}>
+              Spectrum
+            </TabsTrigger>
+            <TabsTrigger value="packets" icon={<Database className="h-4 w-4" />}>
+              Packets
+            </TabsTrigger>
+            <TabsTrigger value="rules" icon={<Shield className="h-4 w-4" />}>
+              Rules
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="spectrum">
@@ -107,7 +114,7 @@ function App() {
             <RulesTab />
           </TabsContent>
         </Tabs>
-      </section>
+      </main>
     </>
   );
 }
