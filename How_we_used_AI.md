@@ -2,25 +2,27 @@
 
 ## Claude (Anthropic)
 
-| Activity | Description |
-|----------|-------------|
-| Work division | Divided project responsibilities between Oliver (backend) and James (frontend) based on the README |
-| Architecture design | Designed the system architecture — WebSocket for packet stream and spectrum data, REST API for rules, SoundDevice running directly on the backend |
-| Schema design | Defined the three data schemas (packet, spectrum, rule) and documented them in `schema.md` |
-| Task planning | Generated prioritized TODO lists for both Oliver (`todo_oliver.md`) and James (`todo_james.md`) |
-| Environment setup | Resolved PyAudio Windows build failure — switched from PyAudio/pipwin to SoundDevice; documented setup in `SETUP.md` |
-| Git guidance | Advised on pulling without losing local changes (stash, commit ordering, push/pull workflow) |
-| Packet sniffer scaffold | Generated `backend/sniffer.py` using Scapy `sniff()`, parsing packets into the agreed schema format |
-| FastAPI + WebSocket server | Built `backend/main.py` — FastAPI app with a `/ws` WebSocket endpoint, async broadcast loop, and Scapy-to-asyncio thread bridge using `call_soon_threadsafe` |
-| Interface discovery | Wrote `backend/find_iface.py` to sniff briefly on each network interface and identify which one carries live traffic |
-| Environment variables | Moved `IFACE` to `.env`, added `python-dotenv` to Pipfile, updated both `main.py` and `sniffer.py` to load from environment |
-| Audio engine | Built `backend/audio.py` — `sounddevice` output stream with white noise base layer, per-packet bandpass-filtered sound bursts (WAV files or noise), attack/decay envelopes, and `np.tanh` distortion on packet rate spikes |
-| FFT spectrum | Added real-time FFT in the audio callback using NumPy/SciPy; broadcasts `type: "spectrum"` messages at ~30fps over the WebSocket |
-| Rules system | Built `POST /rules`, `GET /rules`, `DELETE /rules/{port}` endpoints; `rules.json` persistence; watchdog file watcher to hot-reload rules into the audio engine without restarting |
-| EQ / sound types | Extended rules with `sound_type` (WAV file selector), `frequency_hz` (bandpass centre), and `frequency_boost` (amplitude multiplier) — each port rule acts as an EQ band |
-| IP whitelist | Wired `ip_whitelist` in rules so port rules only apply to packets from specified source IPs |
-| CORS fix | Diagnosed and fixed CORS preflight failures by adding `CORSMiddleware` to FastAPI |
-| Frontend Rules tab | Built `frontend/src/components/RulesTab.tsx` — form to add/update/delete rules with all schema fields, live rules list |
-| Mute button | Added `POST /mute` endpoint and a mute/unmute button in the frontend header that silences the audio engine instantly |
-| Spectrum axis labels | Fixed uPlot spectrum display — converted x-axis from bin indices to Hz, locked y-axis dB range, corrected axis label colours (`stroke` not `color` in uPlot) |
-| Merge conflict guidance | Advised on merging `main` into `backend` branch using `--ours`/`--theirs` to take frontend changes while preserving backend files |
+| Activity                   | Description                                                                                                                                                                                                                |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Work division              | Divided project responsibilities between Oliver (backend) and James (frontend) based on the README                                                                                                                         |
+| Architecture design        | Designed the system architecture — WebSocket for packet stream and spectrum data, REST API for rules, SoundDevice running directly on the backend                                                                          |
+| Schema design              | Defined the three data schemas (packet, spectrum, rule) and documented them in `schema.md`                                                                                                                                 |
+| Task planning              | Generated prioritized TODO lists for both Oliver (`todo_oliver.md`) and James (`todo_james.md`)                                                                                                                            |
+| Environment setup          | Resolved PyAudio Windows build failure — switched from PyAudio/pipwin to SoundDevice; documented setup in `SETUP.md`                                                                                                       |
+| Git guidance               | Advised on pulling without losing local changes (stash, commit ordering, push/pull workflow)                                                                                                                               |
+| Packet sniffer scaffold    | Generated `backend/sniffer.py` using Scapy `sniff()`, parsing packets into the agreed schema format                                                                                                                        |
+| FastAPI + WebSocket server | Built `backend/main.py` — FastAPI app with a `/ws` WebSocket endpoint, async broadcast loop, and Scapy-to-asyncio thread bridge using `call_soon_threadsafe`                                                               |
+| Interface discovery        | Wrote `backend/find_iface.py` to sniff briefly on each network interface and identify which one carries live traffic                                                                                                       |
+| Environment variables      | Moved `IFACE` to `.env`, added `python-dotenv` to Pipfile, updated both `main.py` and `sniffer.py` to load from environment                                                                                                |
+| Audio engine               | Built `backend/audio.py` — `sounddevice` output stream with white noise base layer, per-packet bandpass-filtered sound bursts (WAV files or noise), attack/decay envelopes, and `np.tanh` distortion on packet rate spikes |
+| FFT spectrum               | Added real-time FFT in the audio callback using NumPy/SciPy; broadcasts `type: "spectrum"` messages at ~30fps over the WebSocket                                                                                           |
+| Rules system               | Built `POST /rules`, `GET /rules`, `DELETE /rules/{port}` endpoints; `rules.json` persistence; watchdog file watcher to hot-reload rules into the audio engine without restarting                                          |
+| EQ / sound types           | Extended rules with `sound_type` (WAV file selector), `frequency_hz` (bandpass centre), and `frequency_boost` (amplitude multiplier) — each port rule acts as an EQ band                                                   |
+| IP whitelist               | Wired `ip_whitelist` in rules so port rules only apply to packets from specified source IPs                                                                                                                                |
+| CORS fix                   | Diagnosed and fixed CORS preflight failures by adding `CORSMiddleware` to FastAPI                                                                                                                                          |
+| Frontend Rules tab         | Built `frontend/src/components/RulesTab.tsx` — form to add/update/delete rules with all schema fields, live rules list                                                                                                     |
+| Mute button                | Added `POST /mute` endpoint and a mute/unmute button in the frontend header that silences the audio engine instantly                                                                                                       |
+| Spectrum axis labels       | Fixed uPlot spectrum display — converted x-axis from bin indices to Hz, locked y-axis dB range, corrected axis label colours (`stroke` not `color` in uPlot)                                                               |
+| Merge conflict guidance    | Advised on merging `main` into `backend` branch using `--ours`/`--theirs` to take frontend changes while preserving backend files                                                                                          |
+
+JH used AI to research and for ideas and to help integrate front end and back end together with the websocket. Used it to help debug, but I manually did the fixes and built features in the front end.
