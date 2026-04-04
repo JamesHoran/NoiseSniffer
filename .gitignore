@@ -1,3 +1,7 @@
 # Virtual environment (we use pipenv)
 .venv
 .env
+
+# Hide packet log for debug
+backend/packets.log
+backend/find_iface.py
