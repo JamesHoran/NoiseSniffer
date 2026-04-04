@@ -15,6 +15,7 @@ BLOCK_SIZE  = 512
 
 NOISE_AMPLITUDE = 0.08   # base white noise level
 TONE_AMPLITUDE  = 0.4    # base tone amplitude
+DRONE_AMPLITUDE = 0.25   # per-note amplitude for the C major drone chord
 
 FFT_SIZE          = 2048
 NUM_BINS          = 1024
@@ -38,6 +39,9 @@ NOTES: dict[str, float] = {
 DEFAULT_NOTE = "A4"
 
 SOUNDS_DIR = Path(__file__).parent / "sounds"
+
+# C major drone: C4, E4, G4
+DRONE_FREQS = [261.63, 329.63, 392.00]
 
 
 # Piano-like harmonic ratios and amplitudes
@@ -75,7 +79,7 @@ def _load_piano_samples() -> dict[str, np.ndarray]:
             if sr != SAMPLE_RATE:
                 target_len = int(len(data) * SAMPLE_RATE / sr)
                 data = scipy_resample(data, target_len).astype(np.float32)
-            samples[key] = data
+            samples[key] = data[:len(data) // 2]
         except Exception as e:
             print(f"[audio] Failed to load {ogg_file}: {e}")
     print(f"[audio] Loaded {len(samples)} piano sample(s)")
@@ -229,6 +233,7 @@ class AudioEngine:
         self._sample_buffer: deque[float] = deque(maxlen=FFT_SIZE)
         self._samples_since_spectrum: int = 0
         self.latest_spectrum: list[float] | None = None
+        self._drone_phases: list[float] = [0.0] * len(DRONE_FREQS)
 
     def start(self):
         self._stream = sd.OutputStream(
@@ -296,6 +301,13 @@ class AudioEngine:
             self._active_tones.append(self._new_tones.get_nowait())
 
         signal = (np.random.randn(frames) * NOISE_AMPLITUDE).astype(np.float32)
+
+        # C major drone
+        for i, freq in enumerate(DRONE_FREQS):
+            phase_step = 2 * np.pi * freq / SAMPLE_RATE
+            phases = self._drone_phases[i] + np.arange(frames) * phase_step
+            signal += (np.sin(phases) * DRONE_AMPLITUDE).astype(np.float32)
+            self._drone_phases[i] = float(phases[-1] % (2 * np.pi))
 
         dead = []
         for i, tone in enumerate(self._active_tones):

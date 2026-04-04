@@ -1,4 +1,6 @@
 """
+LEGACY, WE USE SOUNDFILE WITH .OGG NOW
+
 Piano-like synthesizer using additive synthesis.
 Creates piano-like tones by layering multiple harmonics with piano-style envelopes.
 """
@@ -22,6 +24,8 @@ PIANO_HARMONICS = [
 
 class PianoTone:
     """
+    LEGACY, WE USE SOUNDFILE WITH .OGG NOW
+
     Piano-like tone with additive synthesis and realistic envelope.
 
     Piano envelope has:
