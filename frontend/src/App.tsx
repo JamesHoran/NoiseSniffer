@@ -1,11 +1,15 @@
 import "./App.css";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs";
-import React from "react";
-import uPlot from "uplot";
-import UplotReact from "uplot-react";
-import "uplot/dist/uPlot.min.css";
+import { SpectrumAnalyzer } from "./components/SpectrumAnalyzer";
 
-const Chart = () => <UplotReact options={options} data={data} target={target} onCreate={chart => {}} onDelete={chart => {}} />;
+// Demo data for spectrum analyzer
+const demoWave = Array.from({ length: 1024 }, () => -60 + Math.random() * 40);
+
+const demoAnnotations = [
+  { label: "ARP", frequency: 100 },
+  { label: "DNS", frequency: 300 },
+  { label: "HTTPS", frequency: 443 },
+];
 
 function App() {
   return (
@@ -13,13 +17,21 @@ function App() {
       <section id="center">
         <Tabs defaultValue="tab1">
           <TabsList>
-            <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-            <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+            <TabsTrigger value="tab1">Spectrum Analyzer</TabsTrigger>
+            <TabsTrigger value="tab2">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="tab1">
-            <Chart />
+            <SpectrumAnalyzer
+              data={{ wave: demoWave }}
+              annotations={demoAnnotations}
+            />
           </TabsContent>
-          <TabsContent value="tab2">Content 2</TabsContent>
+          <TabsContent value="tab2">
+            <div className="p-4">
+              <h2 className="text-xl font-bold mb-4">Settings</h2>
+              <p className="text-gray-400">Configure your spectrum analyzer settings here.</p>
+            </div>
+          </TabsContent>
         </Tabs>
       </section>
     </>
