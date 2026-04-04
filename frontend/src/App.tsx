@@ -1,7 +1,8 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useState } from "react";
 import "./App.css";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs";
 import { SpectrumAnalyzer } from "./components/SpectrumAnalyzer";
+import { RulesTab } from "./components/RulesTab";
 // Assuming you have a PacketTable component for the left side of your sketch
 // import { PacketTable } from "./components/PacketTable";
 import { useWebSocket } from "./hooks/useWebSocket";
@@ -38,6 +39,18 @@ function App() {
     }
   }, []);
 
+  const [isMuted, setIsMuted] = useState(false);
+
+  const toggleMute = async () => {
+    const next = !isMuted;
+    await fetch("http://localhost:8000/mute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ muted: next }),
+    });
+    setIsMuted(next);
+  };
+
   const { isConnected } = useWebSocket<any>(WS_URL, {
     onMessage: handleMessage,
     reconnectInterval: 3000,
@@ -60,6 +73,16 @@ function App() {
             <span className="text-xs text-gray-500">
               {WS_URL}
             </span>
+            <button
+              onClick={toggleMute}
+              className={`text-xs px-3 py-1 rounded border transition-colors ${
+                isMuted
+                  ? "border-red-700 text-red-400 hover:border-red-500"
+                  : "border-gray-600 text-gray-300 hover:border-gray-400"
+              }`}
+            >
+              {isMuted ? "Unmute" : "Mute"}
+            </button>
           </div>
         </div>
 
@@ -67,6 +90,7 @@ function App() {
           <TabsList>
             <TabsTrigger value="tab1">Spectrum Analyzer</TabsTrigger>
             <TabsTrigger value="tab2">Settings</TabsTrigger>
+            <TabsTrigger value="tab3">Rules</TabsTrigger>
           </TabsList>
           
           <TabsContent value="tab1">
@@ -79,6 +103,10 @@ function App() {
 
           <TabsContent value="tab2">
              {/* ... Settings content remains exactly the same ... */}
+          </TabsContent>
+
+          <TabsContent value="tab3">
+            <RulesTab />
           </TabsContent>
         </Tabs>
       </section>

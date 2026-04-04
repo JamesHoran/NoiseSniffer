@@ -42,10 +42,12 @@ Sent at ~30fps for the spectrum analyzer (Tab 2).
 {
   "port": 443,
   "ip_whitelist": ["192.168.1.1", "10.0.0.5"],
-  "sound_type": "wind",
+  "sound_type": "synth",
+  "frequency_hz": 1000,
   "frequency_boost": 1.5
 }
 ```
 - `ip_whitelist`: list of IPs this rule applies to; empty list `[]` means all IPs
-- `sound_type`: `"wind"`, `"forest"`, `"fire"`, or `"white_noise"`
-- `frequency_boost`: multiplier applied to this port's frequency band (1.0 = neutral)
+- `sound_type`: `"white_noise"`, `"fire"`, `"synth"`, `"rain"`, or `"wind"`
+- `frequency_hz`: centre frequency (Hz) of the bandpass EQ filter; omit to use automatic port-based mapping
+- `frequency_boost`: amplitude multiplier for this band (1.0 = neutral)

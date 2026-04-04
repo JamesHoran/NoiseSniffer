@@ -16,9 +16,13 @@ export interface SpectrumAnalyzerProps {
 }
 
 const DEFAULT_BINS = 1024;
+const SAMPLE_RATE = 44100;
+const FFT_SIZE = 2048;
+const HZ_PER_BIN = SAMPLE_RATE / FFT_SIZE;   // ≈ 21.5 Hz per bin
+const MAX_FREQ_HZ = (SAMPLE_RATE / 2);        // 22050 Hz
 
 const generateFrequencyBins = (count: number): number[] => {
-  return Array.from({ length: count }, (_, i) => i);
+  return Array.from({ length: count }, (_, i) => i * HZ_PER_BIN);
 };
 
 export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
@@ -91,9 +95,10 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
       x: {
         time: false,
         auto: false,
-        range: [0, DEFAULT_BINS - 1],
+        range: [0, MAX_FREQ_HZ],
       },
       y: {
+        auto: false,
         min: -100,
         max: 0,
       },
@@ -125,10 +130,10 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
           width: 1,
           size: 4,
         },
-        label: 'Frequency Bin',
+        label: 'Frequency (Hz)',
+        values: (_self, splits) => splits.map(v => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v.toFixed(0)),
         labelFont: 'bold 12px system-ui',
-        labelColor: '#9ca3af',
-        color: '#9ca3af',
+        stroke: '#d5d5d5',
         font: '11px system-ui',
         size: 50,
       },
@@ -147,8 +152,7 @@ export const SpectrumAnalyzer: React.FC<SpectrumAnalyzerProps> = ({
         },
         label: 'Amplitude (dB)',
         labelFont: 'bold 12px system-ui',
-        labelColor: '#9ca3af',
-        color: '#9ca3af',
+        stroke: '#d5d5d5',
         font: '11px system-ui',
         size: 60,
         values: (_self, splits) => splits.map(v => v.toFixed(0) + ' dB'),

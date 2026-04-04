@@ -24,9 +24,9 @@
 - [+] Send `type: "spectrum"` messages over the WebSocket at ~30fps
 
 ## Step 6: Rules
-- [ ] Add `POST /rules` REST endpoint to FastAPI
-- [ ] Save received rules to `rules.json`
-- [ ] Watch `rules.json` for changes (watchdog) and apply updated rules to the audio engine
+- [+] Add `POST /rules` REST endpoint to FastAPI
+- [+] Save received rules to `rules.json`
+- [+] Watch `rules.json` for changes (watchdog) and apply updated rules to the audio engine
 
 ## Step 7: Suspicious/malicious detection
 - [ ] Detect SYN floods and other suspicious patterns

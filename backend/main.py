@@ -4,14 +4,24 @@ import os
 import threading
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from scapy.all import sniff, conf as scapy_conf
 from sniffer import parse_packet
 from audio import engine as audio_engine
+from rules import save_rule, delete_rule, get_rules, start_watcher
 
 load_dotenv()
 IFACE = os.environ["IFACE"]  # set in .env
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # The core problem: Scapy's sniff() is blocking — it runs a while True loop on its own OS thread.       
 # FastAPI/uvicorn is async — it runs everything on a single-threaded event loop. These two worlds can't 
@@ -60,6 +70,9 @@ async def startup():
     # Start the audio engine (opens the sounddevice output stream).
     audio_engine.start()
 
+    # Load rules.json and watch for external changes.
+    start_watcher(audio_engine.update_rules)
+
     # Launch the broadcast loop as a background async task.
     asyncio.create_task(_broadcast_loop())
     asyncio.create_task(_spectrum_loop())
@@ -82,6 +95,44 @@ async def _broadcast_loop():
 
         # Feed the packet into the audio engine.
         audio_engine.on_packet(json.loads(message))
+
+
+class MuteRequest(BaseModel):
+    muted: bool
+
+
+@app.post("/mute")
+async def set_mute(body: MuteRequest):
+    audio_engine.set_muted(body.muted)
+    return {"muted": body.muted}
+
+
+class Rule(BaseModel):
+    port: int
+    ip_whitelist: list[str] = []
+    sound_type: str = "white_noise"  # white_noise | fire | synth | rain | wind
+    frequency_hz: float | None = None  # None = use automatic port-based mapping
+    frequency_boost: float = 1.0
+
+
+@app.get("/rules")
+async def list_rules():
+    return list(get_rules().values())
+
+
+@app.post("/rules", status_code=201)
+async def post_rule(rule: Rule):
+    """Create or update a rule for a given port."""
+    rule_dict = rule.model_dump()
+    save_rule(rule_dict)
+    audio_engine.update_rules(get_rules())
+    return rule_dict
+
+
+@app.delete("/rules/{port}", status_code=204)
+async def remove_rule(port: int):
+    delete_rule(port)
+    audio_engine.update_rules(get_rules())
 
 
 async def _spectrum_loop():
