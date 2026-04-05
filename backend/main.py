@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import threading
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,7 +15,24 @@ from rules import save_rule, delete_rule, get_rules, start_watcher
 load_dotenv()
 IFACE = os.environ["IFACE"]  # set in .env
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global _loop
+    _loop = asyncio.get_running_loop()
+
+    t = threading.Thread(target=_start_sniffer, daemon=True)
+    t.start()
+
+    audio_engine.start()
+    start_watcher(audio_engine.update_rules)
+    asyncio.create_task(_broadcast_loop())
+    asyncio.create_task(_spectrum_loop())
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -55,27 +73,6 @@ def _start_sniffer():
     scapy_conf.verb = 0  # suppress Scapy's console output
     sniff(iface=IFACE, filter="ip", prn=_on_packet, store=False)
 
-
-@app.on_event("startup")
-async def startup():
-    global _loop
-    # Grab the event loop now, while we're inside async context.
-    _loop = asyncio.get_running_loop()
-
-    # Run Scapy on a daemon thread so it doesn't block the event loop.
-    # daemon=True means the thread is killed automatically when the process exits.
-    t = threading.Thread(target=_start_sniffer, daemon=True)
-    t.start()
-
-    # Start the audio engine (opens the sounddevice output stream).
-    audio_engine.start()
-
-    # Load rules.json and watch for external changes.
-    start_watcher(audio_engine.update_rules)
-
-    # Launch the broadcast loop as a background async task.
-    asyncio.create_task(_broadcast_loop())
-    asyncio.create_task(_spectrum_loop())
 
 
 async def _broadcast_loop():
