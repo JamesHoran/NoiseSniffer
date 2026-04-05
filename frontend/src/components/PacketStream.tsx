@@ -58,7 +58,9 @@ export default function PacketStream() {
       },
     },
     { accessorKey: "src_ip", header: "Source" },
+    { accessorKey: "src_port", header: "S.Port" },
     { accessorKey: "dst_ip", header: "Dest" },
+    { accessorKey: "dst_port", header: "D.Port" },
     { accessorKey: "protocol", header: "Protocol" },
     { accessorKey: "length", header: "Len" },
   ];
