@@ -45,11 +45,12 @@ Scapy thread  ──→  asyncio.Queue  ──→  _broadcast_loop()  ──→ 
 
 | File | Purpose |
 |---|---|
-| `backend/main.py` | FastAPI app, WebSocket, REST endpoints, startup wiring |
+| `backend/main.py` | FastAPI app, WebSocket, REST endpoints, lifespan startup wiring |
 | `backend/audio.py` | AudioEngine, tone synthesis, OGG piano playback, FFT spectrum |
 | `backend/rules.py` | Rule CRUD, JSON persistence, watchdog file watcher |
 | `backend/sniffer.py` | Scapy packet parsing → normalised dict |
 | `backend/sounds/*.ogg` | Piano samples C3–B5 (36 chromatic notes, named e.g. `cs4.ogg` for C#4) |
+| `frontend/src/components/PacketStream.tsx` | Live packet table (timestamp, src/dst IP, src/dst port, protocol, length) |
 | `frontend/src/components/RulesTab.tsx` | Rule creation/management UI |
 | `frontend/src/components/SpectrumAnalyzer.tsx` | FFT spectrum visualisation |
 | `frontend/src/hooks/useWebSocket.ts` | WebSocket connection with auto-reconnect |
