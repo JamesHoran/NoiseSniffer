@@ -13,9 +13,9 @@ from scipy.signal import resample as scipy_resample
 SAMPLE_RATE = 44100
 BLOCK_SIZE  = 512
 
-NOISE_AMPLITUDE = 0.05 # base white noise level
-TONE_AMPLITUDE  = 0.4    # base tone amplitude
-DRONE_AMPLITUDE = 0.25   # per-note amplitude for the C major drone chord
+NOISE_AMPLITUDE = 0.03 # base white noise level
+TONE_AMPLITUDE  = 0.05    # base tone amplitude
+DRONE_AMPLITUDE = 0.30   # per-note amplitude for the C major drone chord
 
 FFT_SIZE          = 2048
 NUM_BINS          = 1024
@@ -235,6 +235,14 @@ class AudioEngine:
         self.latest_spectrum: list[float] | None = None
         self._drone_phases: list[float] = [0.0] * len(DRONE_FREQS)
 
+        # Compressor state for smooth dynamic range control
+        self._compressor_gain: float = 1.0
+        self._compressor_threshold: float = 0.5  # Start compressing at -6dB
+        self._compressor_ratio: float = 4.0      # 4:1 ratio
+        self._compressor_attack: float = 0.001   # 1ms attack
+        self._compressor_release: float = 0.1    # 100ms release
+        self._compressor_makeup: float = 1.5     # Boost after compression
+
     def start(self):
         self._stream = sd.OutputStream(
             samplerate=SAMPLE_RATE,
@@ -292,6 +300,48 @@ class AudioEngine:
             print(f"[rule hit] port={dst_port} note={note} ({freq:.1f} Hz) boost={boost}")
             self._new_tones.put(_Tone(freq, boost))
 
+    def _apply_compression(self, signal: np.ndarray, frames: int) -> np.ndarray:
+        """
+        Apply dynamic range compression to prevent clipping and smooth out volume peaks.
+
+        Uses a soft-knee compressor with configurable threshold, ratio, attack, and release.
+        """
+        # Calculate instantaneous signal level (RMS-like envelope)
+        level = np.abs(signal)
+        avg_level = float(np.mean(level))
+
+        # Calculate how much over threshold we are
+        excess_db = 20 * np.log10(avg_level / self._compressor_threshold + 1e-10)
+
+        # Apply compression ratio with soft knee
+        if excess_db > 0:
+            # Smooth knee transition (first 6dB)
+            knee_width = 6.0
+            if excess_db < knee_width:
+                # Soft knee: gradual compression
+                gain_reduction = (excess_db ** 2) / (2 * knee_width * self._compressor_ratio)
+            else:
+                # Hard ratio beyond knee
+                gain_reduction = (knee_width / (2 * self._compressor_ratio) +
+                                  (excess_db - knee_width) / self._compressor_ratio)
+
+            target_gain = 10 ** (-gain_reduction / 20)
+        else:
+            target_gain = 1.0
+
+        # Smooth gain changes (attack/release)
+        coeff = (self._compressor_attack if target_gain < self._compressor_gain
+                 else self._compressor_release)
+        alpha = 1 - np.exp(-1 / (coeff * SAMPLE_RATE / frames))
+
+        self._compressor_gain = self._compressor_gain + alpha * (target_gain - self._compressor_gain)
+
+        # Apply compression gain and make-up gain
+        compressed = signal * self._compressor_gain * self._compressor_makeup
+
+        # Final safety clip (should rarely trigger with proper compression)
+        return np.clip(compressed, -1.0, 1.0)
+
     def _callback(self, outdata, frames, time_info, status):
         if self._muted:
             outdata[:] = 0
@@ -318,7 +368,8 @@ class AudioEngine:
         for i in reversed(dead):
             self._active_tones.pop(i)
 
-        outdata[:, 0] = np.clip(signal, -1.0, 1.0)
+        # Apply compression instead of hard clipping
+        outdata[:, 0] = self._apply_compression(signal, frames)
 
         self._sample_buffer.extend(outdata[:, 0].tolist())
         self._samples_since_spectrum += frames
