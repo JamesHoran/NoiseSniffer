@@ -11,7 +11,17 @@ Network packet sniffer that turns live traffic into audio. Each rule maps a port
 | Audio | sounddevice (OutputStream), soundfile (OGG decode), scipy (resampling) |
 | Signal | NumPy (FFT, sine generation) |
 | Frontend | React 19, TypeScript, Tailwind CSS |
+| Data grid | TanStack Table (prevents DOM crashes via buffer-flush pattern) |
+| Visualization | uPlot (canvas-based, efficient at 60Hz) |
 | Package managers | pipenv (backend), pnpm (frontend) |
+
+## Design decisions
+
+### Why TanStack Table?
+TanStack Table (`@tanstack/react-table`) prevents DOM crashes during high packet throughput. The implementation uses a buffer-flush pattern: WebSocket messages accumulate in a React ref (bypassing re-renders), then periodically flush to state at 500ms intervals. Without this, receiving hundreds of packets/second would thrash the DOM.
+
+### Why uPlot?
+uPlot handles 60Hz spectrum updates smoothly via canvas rendering. SVG-based libraries (Chart.js, Recharts) drop frames at this frequency. uPlot also uses significantly less memory for real-time data.
 
 ## Running
 

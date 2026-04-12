@@ -1,6 +1,6 @@
 # NoiseSniffer
 
-Real-time network monitoring that sonifies your traffic—**hear your network sing**.
+**Hear your network traffic in real-time.** An innovative security monitoring tool that converts network packets into sound—making threats like port scans and DDoS attacks immediately obvious to the ear.
 
 > "What would your network sound like if it could play itself?"
 
@@ -10,31 +10,22 @@ By James Horan and Oliver Tasset
 
 ## Overview
 
-NoiseSniffer is a network packet sniffer that converts live traffic into audio. Each rule maps a port to a sound and musical note, transforming invisible data packets into an immersive symphony. Instead of staring at scrolling logs, you hear your network's patterns—and notice anomalies instantly.
+NoiseSniffer is a network monitoring application that turns live traffic into audio. Instead of staring at scrolling log files, you hear your network's patterns as they happen. Each network port plays a different musical note—normal traffic becomes a familiar soundscape, and anything unusual stands out instantly.
 
-### The Problem
+### Why Audio Works
 
-Traditional network monitoring is broken:
-- **Visual fatigue** — reading logs requires constant attention
-- **Reactive, not proactive** — you notice issues only after alarms trigger
-- **Pattern blindness** — subtle changes in text data streams go unnoticed
-- **Information overload** — meaningful signals drown in log noise
-- **Delayed awareness** — by the time you see an anomaly, damage is done
+The human ear is naturally good at detecting patterns. We notice when a rhythm changes, when a new sound appears, or when something gets too loud. NoiseSniffer applies this to network security:
 
-### The Solution
+- **Normal traffic** sounds like a familiar melody
+- **Port scanning** sounds like rapid-fire notes
+- **DDoS attacks** create a "wall of sound"
+- **Silence** means the network went down
 
-The human ear is incredibly pattern-sensitive. We can detect a familiar melody changing, notice when a rhythm falters, and pick out unusual sounds—all while focusing on something else.
+You can monitor your network while focusing on other work—your ears will alert you when something changes.
 
-NoiseSniffer exploits this by turning network traffic into sound:
-- **HTTPS** hums in C4 (piano)
-- **SSH** chirps in F#5 (piano)
-- **DNS** ripples in B4 (piano)
-- Normal traffic becomes a familiar soundscape
-- Anything unusual? You hear it instantly
+### What Makes This Different
 
-### Accessibility
-
-NoiseSniffer accommodates users with visual impairments by providing an audio-first approach to network monitoring. Network activity that traditionally requires reading logs can now be monitored through sound patterns—making network security accessible to everyone.
+Traditional network monitoring tools require constant visual attention. You have to watch logs, interpret data, and often notice problems only after alarms trigger. NoiseSniffer provides immediate, intuitive awareness—you hear changes as they happen.
 
 ---
 
@@ -80,7 +71,17 @@ NoiseSniffer accommodates users with visual impairments by providing an audio-fi
 | **Audio** | sounddevice (OutputStream), soundfile (OGG decode), scipy (resampling) |
 | **Signal Processing** | NumPy (FFT, sine generation) |
 | **Frontend** | React 19, TypeScript, Tailwind CSS v4 |
+| **Data Grid** | TanStack Table (virtualized, headless UI) |
+| **Visualization** | uPlot (high-performance canvas charting) |
 | **Package Managers** | pipenv (backend), pnpm (frontend) |
+
+### Design Decisions
+
+#### Why TanStack Table?
+TanStack Table (`@tanstack/react-table`) was chosen for the live packet stream to prevent UI crashes under high-throughput conditions. The table implements a buffer-flush pattern where WebSocket messages accumulate in a ref (bypassing React re-renders) and flush to state periodically. This prevents the UI from freezing when receiving hundreds of packets per second.
+
+#### Real-time Audio Architecture
+The audio engine uses a lock-free queue and non-blocking callback to achieve zero-latency playback. Packet capture runs on a dedicated OS thread and hands data to the async event loop via `call_soon_threadsafe`, ensuring no packets are dropped while maintaining smooth audio output.
 
 ---
 
@@ -99,12 +100,12 @@ Each packet is matched against configured rules:
 
 ### 3. Audio Generation
 Two tone types share the same interface:
-- **Synth** — synthesized sine burst (20ms attack, 480ms decay)
+- **Synth** — synthesized sine burst (10ms attack, 300ms decay)
 - **Piano** — plays a pre-loaded OGG sample, scaled by frequency boost
 
 All 36 piano samples (C3–B5) are decoded and resampled to 44.1kHz at startup. Base white noise runs constantly; tones are mixed on top via a real-time `sounddevice.OutputStream` callback.
 
-**In the case of a SYN flood or DoS attack**, the sheer amount of packets will boost the sound into distortion territory, sounding harsh and loud—an immediate audio indicator that something is wrong.
+**During high-volume attacks** (SYN flood, DDoS), the sheer number of packets pushes the sound into natural distortion—a clear audio indicator that something is wrong.
 
 ### 4. Spectrum Analysis
 A 1024-bin FFT analyzes the audio output in real-time, normalized to -100...0 dB range. Frequency annotations are added for active tones.
